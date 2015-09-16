@@ -1,0 +1,390 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1E8B113E-8ABF-48DC-8FD6-5BB41B66CFFA}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>make -r 2&gt;&amp;1 | sed -e %27s/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeBuildCommandLine>
+    <NMakeOutput>cquake3.3dsx</NMakeOutput>
+    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>make clean &amp;&amp; make -r 2&gt;&amp;1 | sed -e %27s/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>ARM11;_HAVE_STDC;_3DS;Q3_STATIC</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>C:\devkitPro\libctru\include;C:\devkitPro\devkitARM\arm-none-eabi\include;$ProjectDir)\..\;C:\devl\quake3\code\3ds;C:\devl\quake3\code\3ds\cquake3\include</NMakeIncludeSearchPath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath />
+    <ReferencePath />
+    <LibraryPath />
+    <LibraryWPath />
+    <SourcePath />
+    <ExcludePath />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>make -r 2&gt;&amp;1 | sed -e %27s/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeBuildCommandLine>
+    <NMakeOutput>cquake3.3dsx</NMakeOutput>
+    <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
+    <NMakeReBuildCommandLine>make clean &amp;&amp; make -r 2&gt;&amp;1 | sed -e %27s/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/</NMakeReBuildCommandLine>
+    <NMakePreprocessorDefinitions>ARM11;_HAVE_STDC;WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>c:\devl\ctrulib\libctru\include;C:\devkitPro\devkitARM\arm-none-eabi\include;C:\devkitPro\devkitARM\lib\gcc\arm-none-eabi\4.8.2\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\botlib\be_aas_bspq3.c" />
+    <ClCompile Include="..\..\botlib\be_aas_cluster.c" />
+    <ClCompile Include="..\..\botlib\be_aas_debug.c" />
+    <ClCompile Include="..\..\botlib\be_aas_entity.c" />
+    <ClCompile Include="..\..\botlib\be_aas_file.c" />
+    <ClCompile Include="..\..\botlib\be_aas_main.c" />
+    <ClCompile Include="..\..\botlib\be_aas_move.c" />
+    <ClCompile Include="..\..\botlib\be_aas_optimize.c" />
+    <ClCompile Include="..\..\botlib\be_aas_reach.c" />
+    <ClCompile Include="..\..\botlib\be_aas_route.c" />
+    <ClCompile Include="..\..\botlib\be_aas_routealt.c" />
+    <ClCompile Include="..\..\botlib\be_aas_sample.c" />
+    <ClCompile Include="..\..\botlib\be_ai_char.c" />
+    <ClCompile Include="..\..\botlib\be_ai_chat.c" />
+    <ClCompile Include="..\..\botlib\be_ai_gen.c" />
+    <ClCompile Include="..\..\botlib\be_ai_goal.c" />
+    <ClCompile Include="..\..\botlib\be_ai_move.c" />
+    <ClCompile Include="..\..\botlib\be_ai_weap.c" />
+    <ClCompile Include="..\..\botlib\be_ai_weight.c" />
+    <ClCompile Include="..\..\botlib\be_ea.c" />
+    <ClCompile Include="..\..\botlib\be_interface.c" />
+    <ClCompile Include="..\..\botlib\l_crc.c" />
+    <ClCompile Include="..\..\botlib\l_libvar.c" />
+    <ClCompile Include="..\..\botlib\l_log.c" />
+    <ClCompile Include="..\..\botlib\l_memory.c" />
+    <ClCompile Include="..\..\botlib\l_precomp.c" />
+    <ClCompile Include="..\..\botlib\l_script.c" />
+    <ClCompile Include="..\..\botlib\l_struct.c" />
+    <ClCompile Include="..\..\cgame\cg_consolecmds.c" />
+    <ClCompile Include="..\..\cgame\cg_draw.c" />
+    <ClCompile Include="..\..\cgame\cg_drawtools.c" />
+    <ClCompile Include="..\..\cgame\cg_effects.c" />
+    <ClCompile Include="..\..\cgame\cg_ents.c" />
+    <ClCompile Include="..\..\cgame\cg_event.c" />
+    <ClCompile Include="..\..\cgame\cg_info.c" />
+    <ClCompile Include="..\..\cgame\cg_localents.c" />
+    <ClCompile Include="..\..\cgame\cg_main.c" />
+    <ClCompile Include="..\..\cgame\cg_marks.c" />
+    <ClCompile Include="..\..\cgame\cg_newdraw.c" />
+    <ClCompile Include="..\..\cgame\cg_particles.c" />
+    <ClCompile Include="..\..\cgame\cg_players.c" />
+    <ClCompile Include="..\..\cgame\cg_playerstate.c" />
+    <ClCompile Include="..\..\cgame\cg_predict.c" />
+    <ClCompile Include="..\..\cgame\cg_scoreboard.c" />
+    <ClCompile Include="..\..\cgame\cg_servercmds.c" />
+    <ClCompile Include="..\..\cgame\cg_snapshot.c" />
+    <ClCompile Include="..\..\cgame\cg_syscalls.c" />
+    <ClCompile Include="..\..\cgame\cg_view.c" />
+    <ClCompile Include="..\..\cgame\cg_weapons.c" />
+    <ClCompile Include="..\..\client\cl_cgame.c" />
+    <ClCompile Include="..\..\client\cl_cin.c" />
+    <ClCompile Include="..\..\client\cl_console.c" />
+    <ClCompile Include="..\..\client\cl_input.c" />
+    <ClCompile Include="..\..\client\cl_keys.c" />
+    <ClCompile Include="..\..\client\cl_main.c" />
+    <ClCompile Include="..\..\client\cl_net_chan.c" />
+    <ClCompile Include="..\..\client\cl_parse.c" />
+    <ClCompile Include="..\..\client\cl_scrn.c" />
+    <ClCompile Include="..\..\client\cl_ui.c" />
+    <ClCompile Include="..\..\client\snd_adpcm.c" />
+    <ClCompile Include="..\..\client\snd_dma.c" />
+    <ClCompile Include="..\..\client\snd_mem.c" />
+    <ClCompile Include="..\..\client\snd_mix.c" />
+    <ClCompile Include="..\..\client\snd_wavelet.c" />
+    <ClCompile Include="..\..\game\ai_chat.c" />
+    <ClCompile Include="..\..\game\ai_cmd.c" />
+    <ClCompile Include="..\..\game\ai_dmnet.c" />
+    <ClCompile Include="..\..\game\ai_dmq3.c" />
+    <ClCompile Include="..\..\game\ai_main.c" />
+    <ClCompile Include="..\..\game\ai_team.c" />
+    <ClCompile Include="..\..\game\ai_vcmd.c" />
+    <ClCompile Include="..\..\game\bg_lib.c" />
+    <ClCompile Include="..\..\game\bg_misc.c" />
+    <ClCompile Include="..\..\game\bg_pmove.c" />
+    <ClCompile Include="..\..\game\bg_slidemove.c" />
+    <ClCompile Include="..\..\game\g_active.c" />
+    <ClCompile Include="..\..\game\g_arenas.c" />
+    <ClCompile Include="..\..\game\g_bot.c" />
+    <ClCompile Include="..\..\game\g_client.c" />
+    <ClCompile Include="..\..\game\g_cmds.c" />
+    <ClCompile Include="..\..\game\g_combat.c" />
+    <ClCompile Include="..\..\game\g_items.c" />
+    <ClCompile Include="..\..\game\g_main.c" />
+    <ClCompile Include="..\..\game\g_mem.c" />
+    <ClCompile Include="..\..\game\g_misc.c" />
+    <ClCompile Include="..\..\game\g_missile.c" />
+    <ClCompile Include="..\..\game\g_mover.c" />
+    <ClCompile Include="..\..\game\g_rankings.c" />
+    <ClCompile Include="..\..\game\g_session.c" />
+    <ClCompile Include="..\..\game\g_spawn.c" />
+    <ClCompile Include="..\..\game\g_svcmds.c" />
+    <ClCompile Include="..\..\game\g_syscalls.c" />
+    <ClCompile Include="..\..\game\g_target.c" />
+    <ClCompile Include="..\..\game\g_team.c" />
+    <ClCompile Include="..\..\game\g_trigger.c" />
+    <ClCompile Include="..\..\game\g_utils.c" />
+    <ClCompile Include="..\..\game\g_weapon.c" />
+    <ClCompile Include="..\..\game\q_math.c" />
+    <ClCompile Include="..\..\game\q_shared.c" />
+    <ClCompile Include="..\..\q3_ui\ui_addbots.c" />
+    <ClCompile Include="..\..\q3_ui\ui_atoms.c" />
+    <ClCompile Include="..\..\q3_ui\ui_cdkey.c" />
+    <ClCompile Include="..\..\q3_ui\ui_cinematics.c" />
+    <ClCompile Include="..\..\q3_ui\ui_confirm.c" />
+    <ClCompile Include="..\..\q3_ui\ui_connect.c" />
+    <ClCompile Include="..\..\q3_ui\ui_controls2.c" />
+    <ClCompile Include="..\..\q3_ui\ui_credits.c" />
+    <ClCompile Include="..\..\q3_ui\ui_demo2.c" />
+    <ClCompile Include="..\..\q3_ui\ui_display.c" />
+    <ClCompile Include="..\..\q3_ui\ui_gameinfo.c" />
+    <ClCompile Include="..\..\q3_ui\ui_ingame.c" />
+    <ClCompile Include="..\..\q3_ui\ui_loadconfig.c" />
+    <ClCompile Include="..\..\q3_ui\ui_login.c" />
+    <ClCompile Include="..\..\q3_ui\ui_main.c" />
+    <ClCompile Include="..\..\q3_ui\ui_menu.c" />
+    <ClCompile Include="..\..\q3_ui\ui_mfield.c" />
+    <ClCompile Include="..\..\q3_ui\ui_mods.c" />
+    <ClCompile Include="..\..\q3_ui\ui_network.c" />
+    <ClCompile Include="..\..\q3_ui\ui_options.c" />
+    <ClCompile Include="..\..\q3_ui\ui_playermodel.c" />
+    <ClCompile Include="..\..\q3_ui\ui_players.c" />
+    <ClCompile Include="..\..\q3_ui\ui_playersettings.c" />
+    <ClCompile Include="..\..\q3_ui\ui_preferences.c" />
+    <ClCompile Include="..\..\q3_ui\ui_qmenu.c" />
+    <ClCompile Include="..\..\q3_ui\ui_rankings.c" />
+    <ClCompile Include="..\..\q3_ui\ui_rankstatus.c" />
+    <ClCompile Include="..\..\q3_ui\ui_removebots.c" />
+    <ClCompile Include="..\..\q3_ui\ui_saveconfig.c" />
+    <ClCompile Include="..\..\q3_ui\ui_serverinfo.c" />
+    <ClCompile Include="..\..\q3_ui\ui_servers2.c" />
+    <ClCompile Include="..\..\q3_ui\ui_setup.c" />
+    <ClCompile Include="..\..\q3_ui\ui_signup.c" />
+    <ClCompile Include="..\..\q3_ui\ui_sound.c" />
+    <ClCompile Include="..\..\q3_ui\ui_sparena.c" />
+    <ClCompile Include="..\..\q3_ui\ui_specifyleague.c" />
+    <ClCompile Include="..\..\q3_ui\ui_specifyserver.c" />
+    <ClCompile Include="..\..\q3_ui\ui_splevel.c" />
+    <ClCompile Include="..\..\q3_ui\ui_sppostgame.c" />
+    <ClCompile Include="..\..\q3_ui\ui_spreset.c" />
+    <ClCompile Include="..\..\q3_ui\ui_spskill.c" />
+    <ClCompile Include="..\..\q3_ui\ui_startserver.c" />
+    <ClCompile Include="..\..\q3_ui\ui_team.c" />
+    <ClCompile Include="..\..\q3_ui\ui_teamorders.c" />
+    <ClCompile Include="..\..\q3_ui\ui_video.c" />
+    <ClCompile Include="..\..\qcommon\cmd.c" />
+    <ClCompile Include="..\..\qcommon\cm_load.c" />
+    <ClCompile Include="..\..\qcommon\cm_patch.c" />
+    <ClCompile Include="..\..\qcommon\cm_polylib.c" />
+    <ClCompile Include="..\..\qcommon\cm_test.c" />
+    <ClCompile Include="..\..\qcommon\cm_trace.c" />
+    <ClCompile Include="..\..\qcommon\common.c" />
+    <ClCompile Include="..\..\qcommon\cvar.c" />
+    <ClCompile Include="..\..\qcommon\files.c" />
+    <ClCompile Include="..\..\qcommon\huffman.c" />
+    <ClCompile Include="..\..\qcommon\md4.c" />
+    <ClCompile Include="..\..\qcommon\msg.c" />
+    <ClCompile Include="..\..\qcommon\net_chan.c" />
+    <ClCompile Include="..\..\qcommon\unzip.c" />
+    <ClCompile Include="..\..\qcommon\vm.c" />
+    <ClCompile Include="..\..\qcommon\vm_interpreted.c" />
+    <ClCompile Include="..\..\qcommon\vm_ppc.c" />
+    <ClCompile Include="..\..\qcommon\vm_ppc_new.c" />
+    <ClCompile Include="..\..\qcommon\vm_x86.c" />
+    <ClCompile Include="..\..\renderer\tr_animation.c" />
+    <ClCompile Include="..\..\renderer\tr_backend.c" />
+    <ClCompile Include="..\..\renderer\tr_bsp.c" />
+    <ClCompile Include="..\..\renderer\tr_cmds.c" />
+    <ClCompile Include="..\..\renderer\tr_curve.c" />
+    <ClCompile Include="..\..\renderer\tr_flares.c" />
+    <ClCompile Include="..\..\renderer\tr_font.c" />
+    <ClCompile Include="..\..\renderer\tr_image.c" />
+    <ClCompile Include="..\..\renderer\tr_init.c" />
+    <ClCompile Include="..\..\renderer\tr_light.c" />
+    <ClCompile Include="..\..\renderer\tr_main.c" />
+    <ClCompile Include="..\..\renderer\tr_marks.c" />
+    <ClCompile Include="..\..\renderer\tr_mesh.c" />
+    <ClCompile Include="..\..\renderer\tr_model.c" />
+    <ClCompile Include="..\..\renderer\tr_noise.c" />
+    <ClCompile Include="..\..\renderer\tr_scene.c" />
+    <ClCompile Include="..\..\renderer\tr_shade.c" />
+    <ClCompile Include="..\..\renderer\tr_shader.c" />
+    <ClCompile Include="..\..\renderer\tr_shade_calc.c" />
+    <ClCompile Include="..\..\renderer\tr_shadows.c" />
+    <ClCompile Include="..\..\renderer\tr_sky.c" />
+    <ClCompile Include="..\..\renderer\tr_surface.c" />
+    <ClCompile Include="..\..\renderer\tr_world.c" />
+    <ClCompile Include="..\..\server\sv_bot.c" />
+    <ClCompile Include="..\..\server\sv_ccmds.c" />
+    <ClCompile Include="..\..\server\sv_client.c" />
+    <ClCompile Include="..\..\server\sv_game.c" />
+    <ClCompile Include="..\..\server\sv_init.c" />
+    <ClCompile Include="..\..\server\sv_main.c" />
+    <ClCompile Include="..\..\server\sv_net_chan.c" />
+    <ClCompile Include="..\..\server\sv_rankings.c" />
+    <ClCompile Include="..\..\server\sv_snapshot.c" />
+    <ClCompile Include="..\..\server\sv_world.c" />
+    <ClCompile Include="..\..\ui\ui_atoms.c" />
+    <ClCompile Include="..\..\ui\ui_gameinfo.c" />
+    <ClCompile Include="..\..\ui\ui_main.c" />
+    <ClCompile Include="..\..\ui\ui_players.c" />
+    <ClCompile Include="..\..\ui\ui_shared.c" />
+    <ClCompile Include="..\..\ui\ui_syscalls.c" />
+    <ClCompile Include="..\..\ui\ui_util.c" />
+    <ClCompile Include="ctr_rend\ctr_lists.cpp" />
+    <ClCompile Include="ctr_rend\ctr_rend.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_buffer.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_im.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_matrix.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_shader.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_texture.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_unimplemented.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_vao.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_vbo.c" />
+    <ClCompile Include="source\3dmath.c" />
+    <ClCompile Include="source\3ds_client.c" />
+    <ClCompile Include="source\3ds_glimp.c" />
+    <ClCompile Include="source\3ds_input.c" />
+    <ClCompile Include="source\3ds_main.c" />
+    <ClCompile Include="source\3ds_net.c" />
+    <ClCompile Include="source\3ds_snddma.c" />
+    <ClCompile Include="source\3ds_vm.c" />
+    <ClCompile Include="source\ctr_lists.cpp" />
+    <ClCompile Include="source\gpu.c" />
+    <ClCompile Include="source\init.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\botlib\aasfile.h" />
+    <ClInclude Include="..\..\botlib\be_aas_bsp.h" />
+    <ClInclude Include="..\..\botlib\be_aas_cluster.h" />
+    <ClInclude Include="..\..\botlib\be_aas_debug.h" />
+    <ClInclude Include="..\..\botlib\be_aas_def.h" />
+    <ClInclude Include="..\..\botlib\be_aas_entity.h" />
+    <ClInclude Include="..\..\botlib\be_aas_file.h" />
+    <ClInclude Include="..\..\botlib\be_aas_funcs.h" />
+    <ClInclude Include="..\..\botlib\be_aas_main.h" />
+    <ClInclude Include="..\..\botlib\be_aas_move.h" />
+    <ClInclude Include="..\..\botlib\be_aas_optimize.h" />
+    <ClInclude Include="..\..\botlib\be_aas_reach.h" />
+    <ClInclude Include="..\..\botlib\be_aas_route.h" />
+    <ClInclude Include="..\..\botlib\be_aas_routealt.h" />
+    <ClInclude Include="..\..\botlib\be_aas_sample.h" />
+    <ClInclude Include="..\..\botlib\be_ai_weight.h" />
+    <ClInclude Include="..\..\botlib\be_interface.h" />
+    <ClInclude Include="..\..\botlib\l_crc.h" />
+    <ClInclude Include="..\..\botlib\l_libvar.h" />
+    <ClInclude Include="..\..\botlib\l_log.h" />
+    <ClInclude Include="..\..\botlib\l_memory.h" />
+    <ClInclude Include="..\..\botlib\l_precomp.h" />
+    <ClInclude Include="..\..\botlib\l_script.h" />
+    <ClInclude Include="..\..\botlib\l_struct.h" />
+    <ClInclude Include="..\..\botlib\l_utils.h" />
+    <ClInclude Include="..\..\cgame\cg_local.h" />
+    <ClInclude Include="..\..\cgame\cg_public.h" />
+    <ClInclude Include="..\..\cgame\tr_types.h" />
+    <ClInclude Include="..\..\client\client.h" />
+    <ClInclude Include="..\..\client\keys.h" />
+    <ClInclude Include="..\..\client\snd_local.h" />
+    <ClInclude Include="..\..\client\snd_public.h" />
+    <ClInclude Include="..\..\game\ai_chat.h" />
+    <ClInclude Include="..\..\game\ai_cmd.h" />
+    <ClInclude Include="..\..\game\ai_dmnet.h" />
+    <ClInclude Include="..\..\game\ai_dmq3.h" />
+    <ClInclude Include="..\..\game\ai_main.h" />
+    <ClInclude Include="..\..\game\ai_team.h" />
+    <ClInclude Include="..\..\game\ai_vcmd.h" />
+    <ClInclude Include="..\..\game\be_aas.h" />
+    <ClInclude Include="..\..\game\be_ai_char.h" />
+    <ClInclude Include="..\..\game\be_ai_chat.h" />
+    <ClInclude Include="..\..\game\be_ai_gen.h" />
+    <ClInclude Include="..\..\game\be_ai_goal.h" />
+    <ClInclude Include="..\..\game\be_ai_move.h" />
+    <ClInclude Include="..\..\game\be_ai_weap.h" />
+    <ClInclude Include="..\..\game\be_ea.h" />
+    <ClInclude Include="..\..\game\bg_lib.h" />
+    <ClInclude Include="..\..\game\bg_local.h" />
+    <ClInclude Include="..\..\game\bg_public.h" />
+    <ClInclude Include="..\..\game\botlib.h" />
+    <ClInclude Include="..\..\game\chars.h" />
+    <ClInclude Include="..\..\game\g_local.h" />
+    <ClInclude Include="..\..\game\g_public.h" />
+    <ClInclude Include="..\..\game\g_rankings.h" />
+    <ClInclude Include="..\..\game\g_team.h" />
+    <ClInclude Include="..\..\game\inv.h" />
+    <ClInclude Include="..\..\game\match.h" />
+    <ClInclude Include="..\..\game\q_shared.h" />
+    <ClInclude Include="..\..\game\surfaceflags.h" />
+    <ClInclude Include="..\..\game\syn.h" />
+    <ClInclude Include="..\..\q3_ui\keycodes.h" />
+    <ClInclude Include="..\..\q3_ui\ui_local.h" />
+    <ClInclude Include="..\..\qcommon\cm_local.h" />
+    <ClInclude Include="..\..\qcommon\cm_patch.h" />
+    <ClInclude Include="..\..\qcommon\cm_polylib.h" />
+    <ClInclude Include="..\..\qcommon\cm_public.h" />
+    <ClInclude Include="..\..\qcommon\qcommon.h" />
+    <ClInclude Include="..\..\qcommon\qfiles.h" />
+    <ClInclude Include="..\..\qcommon\unzip.h" />
+    <ClInclude Include="..\..\qcommon\vm_local.h" />
+    <ClInclude Include="..\..\renderer\qgl.h" />
+    <ClInclude Include="..\..\renderer\qgl_linked.h" />
+    <ClInclude Include="..\..\renderer\tr_local.h" />
+    <ClInclude Include="..\..\renderer\tr_public.h" />
+    <ClInclude Include="..\..\server\server.h" />
+    <ClInclude Include="..\..\ui\keycodes.h" />
+    <ClInclude Include="..\..\ui\ui_local.h" />
+    <ClInclude Include="..\..\ui\ui_public.h" />
+    <ClInclude Include="..\..\ui\ui_shared.h" />
+    <ClInclude Include="ctr_rend\ctr_lists.h" />
+    <ClInclude Include="ctr_rend\ctr_rend.h" />
+    <ClInclude Include="ctr_rend\gl.h" />
+    <ClInclude Include="include\3dmath.h" />
+    <ClInclude Include="include\ctr_lists.h" />
+    <ClInclude Include="include\ctr_rend.h" />
+    <ClInclude Include="include\gl.h" />
+    <ClInclude Include="include\gpu.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\cgame\cg_syscalls.asm" />
+    <None Include="ctr_rend\ctr_rend.pica" />
+    <None Include="Makefile" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

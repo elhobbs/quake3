@@ -1,0 +1,10 @@
+﻿Build started 9/15/2015 9:49:00 PM.
+     1>Project "C:\devl\quake3\code\3ds\cquake3\cquake3.vcxproj" on node 2 (Clean target(s)).
+     1>CoreClean:
+         make clean
+         clean ...
+     1>Done Building Project "C:\devl\quake3\code\3ds\cquake3\cquake3.vcxproj" (Clean target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.62
