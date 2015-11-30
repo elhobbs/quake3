@@ -111,6 +111,8 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *po
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) {
+	//void *p0 = __builtin_return_address(0);
+	//DBGPRINT("glVertexPointer: %08x\n", p0);
 	CTR_VAO *vao = ctr_handle_get(CTR_HANDLE_VAO, ctr_state.bound_vao);
 	if (vao == 0) {
 		return;

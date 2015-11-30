@@ -316,6 +316,7 @@ void RB_RenderFlare( flare_t *f ) {
 	tess.vertexColors[tess.numVertexes][2] = iColor[2];
 	tess.vertexColors[tess.numVertexes][3] = 255;
 	tess.numVertexes++;
+	printf("RB_RenderFlare\n");
 
 	tess.xyz[tess.numVertexes][0] = f->windowX - size;
 	tess.xyz[tess.numVertexes][1] = f->windowY + size;

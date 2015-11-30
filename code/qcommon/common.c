@@ -37,7 +37,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #ifdef _3DS
+#include <3ds.h>
 #include <netinet/in.h>
+int detect_n3ds(void);
 #endif
 
 int demo_protocols[] =
@@ -1396,6 +1398,9 @@ void Com_InitSmallZoneMemory( void ) {
 	
 	return;
 }
+#ifdef _3DS
+extern u32 __heap_size, __linear_heap_size;
+#endif
 
 void Com_InitZoneMemory( void ) {
 	cvar_t	*cv;
@@ -1408,13 +1413,22 @@ void Com_InitZoneMemory( void ) {
 		s_zoneTotal = cv->integer * 1024 * 1024;
 	}
 
-	// bk001205 - was malloc
-#if 1
+#ifdef _3DS
 	printf("LINEAR  free: %dKB\n", (int)linearSpaceFree() / 1024);
 	printf("REGULAR free: %dKB\n", (int)getMemFree() / 1024);
-	Com_Printf("calloc: %i megs\n", s_zoneTotal / (1024 * 1024));
-	mainzone = calloc(s_zoneTotal,1);
+	if (detect_n3ds()) {
+		s_zoneTotal = 30 * 1024 * 1024;// __heap_size - (12 * 1024 * 1024);
+		Com_Printf("calloc: %i megs\n", s_zoneTotal / (1024 * 1024));
+		mainzone = calloc(s_zoneTotal, 1);
+	}
+	else {
+		s_zoneTotal = 14 * 1024 * 1024;// __heap_size - (12 * 1024 * 1024);
+		Com_Printf("linearAlloc: %i megs\n", s_zoneTotal / (1024 * 1024));
+		mainzone = linearAlloc(s_zoneTotal);
+	}
+
 #else
+	// bk001205 - was malloc
 	mainzone = calloc( s_zoneTotal, 1 );
 #endif
 	if ( !mainzone ) {
@@ -1502,6 +1516,9 @@ void Hunk_SmallLog( void) {
 	FS_Write(buf, strlen(buf), logfile);
 }
 
+#ifdef _3DS
+extern u32 __heap_size, __linear_heap_size;
+#endif
 /*
 =================
 Com_InitZoneMemory
@@ -1544,11 +1561,21 @@ void Com_InitHunkMemory( void ) {
 		s_hunkTotal = cv->integer * 1024 * 1024;
 	}
 
+#ifdef _3DS
+	if (detect_n3ds()) {
+		s_hunkTotal = 20 * 1024 * 1024;// __linear_heap_size - (10 * 1024 * 1024);
+	}
+	else {
+		s_hunkTotal = 14 * 1024 * 1024;// __linear_heap_size - (10 * 1024 * 1024);
+	}
 
 	waitforit("3c");
+	s_hunkData = calloc(1, s_hunkTotal + 31);
+#else
 	// bk001205 - was malloc
-	s_hunkData = linearAlloc( s_hunkTotal + 31);
-	if ( !s_hunkData ) {
+	s_hunkData = calloc(1, s_hunkTotal + 31);
+#endif
+	if (!s_hunkData) {
 		Com_Error( ERR_FATAL, "Hunk data failed to allocate %i megs", s_hunkTotal / (1024*1024) );
 	}
 	waitforit("3d");
@@ -2379,7 +2406,7 @@ static void Com_WriteCDKey( const char *filename, const char *ikey ) {
 }
 #endif
 
-void waitforit(char *str);
+int waitforit(char *str);
 /*
 =================
 Com_Init
@@ -2462,7 +2489,7 @@ void Com_Init( char *commandLine ) {
 	com_maxfps = Cvar_Get("com_maxfps", "85", CVAR_ARCHIVE);
 	com_blood = Cvar_Get ("com_blood", "1", CVAR_ARCHIVE);
 
-	com_developer = Cvar_Get ("developer", "0", CVAR_TEMP );
+	com_developer = Cvar_Get ("developer", "1", CVAR_TEMP );
 	com_logfile = Cvar_Get ("logfile", "0", CVAR_TEMP );
 
 	com_timescale = Cvar_Get ("timescale", "1", CVAR_CHEAT | CVAR_SYSTEMINFO );
@@ -2470,7 +2497,7 @@ void Com_Init( char *commandLine ) {
 	com_showtrace = Cvar_Get ("com_showtrace", "0", CVAR_CHEAT);
 	com_dropsim = Cvar_Get ("com_dropsim", "0", CVAR_CHEAT);
 	com_viewlog = Cvar_Get( "viewlog", "0", CVAR_CHEAT );
-	com_speeds = Cvar_Get ("com_speeds", "1", 0);
+	com_speeds = Cvar_Get ("com_speeds", "0", 0);
 	com_timedemo = Cvar_Get ("timedemo", "0", CVAR_CHEAT);
 	com_cameraMode = Cvar_Get ("com_cameraMode", "0", CVAR_CHEAT);
 

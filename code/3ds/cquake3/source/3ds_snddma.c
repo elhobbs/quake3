@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-//#define SOUND_COMPILE
+#define SOUND_COMPILE
 
 // snddma_null.c
 // all other sound mixing is portable
@@ -84,7 +84,7 @@ qboolean SNDDMA_Init(void) {
 	Result ret = 0;
 	float pan[] = { -1, 1 };
 
-#if 0
+#if 1
 	if (csndInit() == 0) {
 		printf("Sound init ok!\n");
 	}

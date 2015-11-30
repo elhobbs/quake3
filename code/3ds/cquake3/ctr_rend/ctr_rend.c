@@ -1,5 +1,8 @@
 #include "ctr_rend.h"
+#ifdef _3DS
 #include <3ds.h>
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -58,12 +61,13 @@ void myGPU_SetAttributeBuffers(
 
 	int i, j;
 	u8 sizeTable[0xC];
+	DBGPRINT("-------- %d\n", (u32)totalAttributes);
 	for (i = 0; i<totalAttributes; i++)
 	{
 		u8 v = attributeFormats & 0xF;
 		sizeTable[i] = GPU_FORMATSIZE[v & 3] * ((v >> 2) + 1);
 		attributeFormats >>= 4;
-		DBGPRINT("-------- %d %d\n", v, GPU_FORMATSIZE[v & 3] * ((v >> 2) + 1));
+		DBGPRINT("-------- %d %d %d\n", i, v, GPU_FORMATSIZE[v & 3] * ((v >> 2) + 1));
 	}
 
 	for (i = 0; i<numBuffers; i++)
@@ -86,6 +90,7 @@ void myGPU_SetAttributeBuffers(
 		param[3 * (i + 1) + 2] = (bufferNumAttributes[i] << 28) | ((stride & 0xFFF) << 16) | ((bufferPermutations[i] >> 32) & 0xFFFF);
 	}
 	//DBGPRINT("\n");
+#ifdef _3DS
 
 	GPUCMD_AddIncrementalWrites(GPUREG_ATTRIBBUFFERS_LOC, param, 0x00000027);
 
@@ -93,6 +98,7 @@ void myGPU_SetAttributeBuffers(
 	GPUCMD_AddWrite(GPUREG_0242, (totalAttributes - 1));
 
 	GPUCMD_AddIncrementalWrites(GPUREG_VSH_ATTRIBUTES_PERMUTATION_LOW, ((u32[]){attributePermutation & 0xFFFFFFFF, (attributePermutation >> 32) & 0xFFFF}), 2);
+#endif
 }
 
 int compare(const void * a, const void * b)
@@ -276,7 +282,7 @@ void ctr_set_attr_buffers(int element_count) {
 					attr->bound_array_buffer = 0;
 					attr->size = 4;
 					attr->stride = 4;
-					attr->type = GPU_UNSIGNED_BYTE;
+					attr->type = GL_UNSIGNED_BYTE;
 					attr->ptr = ctr_rend_buffer_alloc(element_count * 4);
 					memset(attr->ptr, 0, element_count * 4);
 					attr_frmt |= ctr_attr_format(attr, i, i, &attr_mask, &attr_perm, &buff_perm[i], &buff_offs[i], &buff_strd[i]);
@@ -349,7 +355,11 @@ void ctr_set_attr_buffers(int element_count) {
 		buff_attr); // Number of attributes for each buffer
 }
 
-void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices) {
+#ifndef GPUREG_VERTEX_OFFSET
+#define GPUREG_VERTEX_OFFSET 0x022A
+#endif
+
+void glDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices, GLint basevertex) {
 	DBGPRINT("glDrawElements %08x %d %08x\n", ctr_state.bound_texture[ctr_state.client_texture_current], count, indices);
 	GLuint _mode = -1;
 	switch (mode) {
@@ -403,7 +413,7 @@ void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indic
 	if (type == GL_SHORT) {
 		format = 0x80000000;
 	}
-
+#ifdef _3DS
 	int mmode;
 	int depth;
 	matrix_4x4 *mat;
@@ -426,6 +436,8 @@ void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indic
 	//pass number of vertices
 	GPUCMD_AddWrite(GPUREG_NUMVERTICES, count);
 
+	GPUCMD_AddWrite(GPUREG_VERTEX_OFFSET, 0x00000000);
+
 	GPUCMD_AddMaskedWrite(GPUREG_GEOSTAGE_CONFIG, 0x2, 0x00000100);
 	GPUCMD_AddMaskedWrite(GPUREG_0253, 0x2, 0x00000100);
 
@@ -433,8 +445,12 @@ void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indic
 	GPUCMD_AddWrite(GPUREG_DRAWELEMENTS, 0x00000001);
 	GPUCMD_AddMaskedWrite(GPUREG_0245, 0x1, 0x00000001);
 	GPUCMD_AddWrite(GPUREG_0231, 0x00000001);
+#endif
 }
 
+void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices) {
+	glDrawElementsBaseVertex(mode, count, type, indices, 0);
+}
 
 void glEnable(GLenum  cap) {
 	switch (cap) {

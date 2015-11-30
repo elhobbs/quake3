@@ -46,6 +46,10 @@ RB_CheckOverflow
 ==============
 */
 void RB_CheckOverflow( int verts, int indexes ) {
+#ifdef _3DS
+	void *p0 = __builtin_return_address(0);
+	printf("RB_CheckOverflow: %d %d %08x\n", verts, indexes, p0);
+#endif
 	if (tess.numVertexes + verts < SHADER_MAX_VERTEXES
 		&& tess.numIndexes + indexes < SHADER_MAX_INDEXES) {
 		return;
@@ -54,9 +58,11 @@ void RB_CheckOverflow( int verts, int indexes ) {
 	RB_EndSurface();
 
 	if ( verts >= SHADER_MAX_VERTEXES ) {
+		//printf("%08x\n", p0);
 		ri.Error(ERR_DROP, "RB_CheckOverflow: verts > MAX (%d > %d)", verts, SHADER_MAX_VERTEXES );
 	}
 	if ( indexes >= SHADER_MAX_INDEXES ) {
+		//printf("%08x\n", p0);
 		ri.Error(ERR_DROP, "RB_CheckOverflow: indices > MAX (%d > %d)", indexes, SHADER_MAX_INDEXES );
 	}
 
@@ -247,7 +253,7 @@ void RB_SurfaceTriangles( srfTriangles_t *srf ) {
 	color = tess.vertexColors[ tess.numVertexes ];
 	needsNormal = tess.shader->needsNormal;
 
-	for ( i = 0 ; i < srf->numVerts ; i++, dv++, xyz += 4, normal += 4, texCoords += 4, color += 4 ) {
+	for ( i = 0 ; i < srf->numVerts ; i++, dv++, xyz += 3, normal += 3, texCoords += 4, color += 4 ) {
 		xyz[0] = dv->xyz[0];
 		xyz[1] = dv->xyz[1];
 		xyz[2] = dv->xyz[2];
@@ -341,6 +347,8 @@ static void DoRailCore( const vec3_t start, const vec3_t end, const vec3_t up, f
 	int			vbase;
 	float		t = len / 256.0f;
 
+	printf("DoRailCore\n");
+
 	vbase = tess.numVertexes;
 
 	spanWidth2 = -spanWidth;
@@ -401,6 +409,8 @@ static void DoRailDiscs( int numSegs, const vec3_t start, const vec3_t dir, cons
 		numSegs--;
 	if ( !numSegs )
 		return;
+
+	printf("DoRailDiscs\n");
 
 	scale = 0.25;
 
@@ -552,7 +562,7 @@ void RB_SurfaceLightningBolt( void ) {
 * The inputs to this routing seem to always be close to length = 1.0 (about 0.6 to 2.0)
 * This means that we don't have to worry about zero length or enormously long vectors.
 */
-static void VectorArrayNormalize(vec4_t *normals, unsigned int count)
+static void VectorArrayNormalize(vec3_t *normals, unsigned int count)
 {
 //    assert(count);
         
@@ -691,7 +701,7 @@ static void LerpMeshVertexes (md3Surface_t *surf, float backlerp)
 		//
 		for (vertNum=0 ; vertNum < numVerts ; vertNum++,
 			newXyz += 4, newNormals += 4,
-			outXyz += 4, outNormal += 4) 
+			outXyz += 3, outNormal += 3) 
 		{
 
 			outXyz[0] = newXyz[0] * newXyzScale;
@@ -725,7 +735,7 @@ static void LerpMeshVertexes (md3Surface_t *surf, float backlerp)
 
 		for (vertNum=0 ; vertNum < numVerts ; vertNum++,
 			oldXyz += 4, newXyz += 4, oldNormals += 4, newNormals += 4,
-			outXyz += 4, outNormal += 4) 
+			outXyz += 3, outNormal += 3) 
 		{
 			vec3_t uncompressedOldNormal, uncompressedNewNormal;
 
@@ -758,7 +768,7 @@ static void LerpMeshVertexes (md3Surface_t *surf, float backlerp)
 
 //			VectorNormalize (outNormal);
 		}
-    	VectorArrayNormalize((vec4_t *)tess.normal[tess.numVertexes], numVerts);
+    	VectorArrayNormalize(tess.normal[tess.numVertexes], numVerts);
    	}
 }
 
@@ -804,11 +814,13 @@ void RB_SurfaceMesh(md3Surface_t *surface) {
 		// FIXME: fill in lightmapST for completeness?
 	}
 
+	printf("RB_SurfaceMesh: %d\n", surface->numVerts);
+
 	tess.numVertexes += surface->numVerts;
 
 }
 
-
+static FILE *fp = 0;
 /*
 ==============
 RB_SurfaceFace
@@ -816,7 +828,8 @@ RB_SurfaceFace
 */
 void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	int			i;
-	unsigned	*indices, *tessIndexes;
+	glIndex_t	*tessIndexes;
+	unsigned	*indices;
 	float		*v;
 	float		*normal;
 	int			ndx;
@@ -826,6 +839,13 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 
 	RB_CHECKOVERFLOW( surf->numPoints, surf->numIndices );
 
+	if (fp == 0) {
+		//fp = fopen("cquake3_surf.log", "w");
+	}
+	if (fp) {
+		fprintf(fp, "surf: %d\n=========================================\n", surf->numPoints);
+	}
+
 	dlightBits = surf->dlightBits[backEnd.smpFrame];
 	tess.dlightBits |= dlightBits;
 
@@ -834,7 +854,13 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	Bob = tess.numVertexes;
 	tessIndexes = tess.indexes + tess.numIndexes;
 	for ( i = surf->numIndices-1 ; i >= 0  ; i-- ) {
+		if (fp) {
+			fprintf(fp, "%d ", indices[i]);
+		}
 		tessIndexes[i] = indices[i] + Bob;
+	}
+	if (fp) {
+		fprintf(fp, "\n");
 	}
 
 	tess.numIndexes += surf->numIndices;
@@ -853,6 +879,11 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	}
 
 	for ( i = 0, v = surf->points[0], ndx = tess.numVertexes; i < numPoints; i++, v += VERTEXSIZE, ndx++ ) {
+		if (fp) {
+			fprintf(fp, "(%f %f %f)", v[0], v[1], v[2]);
+			fprintf(fp, " (%f %f)", v[3], v[4]);
+			fprintf(fp, " (%f %f)\n", v[5], v[6]);
+		}
 		VectorCopy( v, tess.xyz[ndx]);
 		tess.texCoords[ndx][0][0] = v[3];
 		tess.texCoords[ndx][0][1] = v[4];
@@ -1009,8 +1040,8 @@ void RB_SurfaceGrid( srfGridMesh_t *cv ) {
 				}
 				* ( unsigned int * ) color = * ( unsigned int * ) dv->color;
 				*vDlightBits++ = dlightBits;
-				xyz += 4;
-				normal += 4;
+				xyz += 3;
+				normal += 3;
 				texCoords += 4;
 				color += 4;
 			}
@@ -1049,6 +1080,7 @@ void RB_SurfaceGrid( srfGridMesh_t *cv ) {
 			tess.numIndexes = numIndexes;
 		}
 
+		printf("RB_SurfaceGrid: %d\n", rows * lodWidth);
 		tess.numVertexes += rows * lodWidth;
 
 		used += rows - 1;
@@ -1204,12 +1236,12 @@ void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])( void *) = {
 	(void(*)(void*))RB_SurfaceBad,			// SF_BAD, 
 	(void(*)(void*))RB_SurfaceSkip,			// SF_SKIP, 
 	(void(*)(void*))RB_SurfaceFace,			// SF_FACE,
-	(void(*)(void*))RB_SurfaceGrid,			// SF_GRID,
-	(void(*)(void*))RB_SurfaceTriangles,	// SF_TRIANGLES,
-	(void(*)(void*))RB_SurfacePolychain,	// SF_POLY,
-	(void(*)(void*))RB_SurfaceMesh,			// SF_MD3,
-	(void(*)(void*))RB_SurfaceAnim,			// SF_MD4,
-	(void(*)(void*))RB_SurfaceFlare,		// SF_FLARE,
-	(void(*)(void*))RB_SurfaceEntity,		// SF_ENTITY
-	(void(*)(void*))RB_SurfaceDisplayList	// SF_DISPLAY_LIST
+	(void(*)(void*))RB_SurfaceSkip,//RB_SurfaceGrid,			// SF_GRID,
+	(void(*)(void*))RB_SurfaceSkip,//RB_SurfaceTriangles,	// SF_TRIANGLES,
+	(void(*)(void*))RB_SurfaceSkip,//RB_SurfacePolychain,	// SF_POLY,
+	(void(*)(void*))RB_SurfaceSkip,//RB_SurfaceMesh,			// SF_MD3,
+	(void(*)(void*))RB_SurfaceSkip,//RB_SurfaceAnim,			// SF_MD4,
+	(void(*)(void*))RB_SurfaceSkip,//RB_SurfaceFlare,		// SF_FLARE,
+	(void(*)(void*))RB_SurfaceSkip,//RB_SurfaceEntity,		// SF_ENTITY
+	(void(*)(void*))RB_SurfaceSkip,//RB_SurfaceDisplayList	// SF_DISPLAY_LIST
 };

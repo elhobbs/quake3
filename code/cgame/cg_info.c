@@ -32,6 +32,11 @@ static int			loadingItemIconCount;
 static qhandle_t	loadingPlayerIcons[MAX_LOADING_PLAYER_ICONS];
 static qhandle_t	loadingItemIcons[MAX_LOADING_ITEM_ICONS];
 
+#ifdef Q3_STATIC
+void CG_DrawProportionalString(int x, int y, const char* str, int style, vec4_t color);
+#define UI_DrawProportionalString CG_DrawProportionalString
+#endif
+
 
 /*
 ===================

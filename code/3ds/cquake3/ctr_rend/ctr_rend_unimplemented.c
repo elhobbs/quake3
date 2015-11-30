@@ -100,6 +100,7 @@ void glClearStencil(GLenum a) {
 
 GLenum glGetError() {
 	DBGPRINT("\n");
+	return 0;
 }
 
 

@@ -315,6 +315,7 @@ The module is making a system call
 #define	VMF(x)	((float *)args)[x]
 
 int SV_GameSystemCalls( int *args ) {
+	//printf("SV_GameSystemCalls: %d\n", args[0]);
 	switch( args[0] ) {
 	case G_PRINT:
 		Com_Printf( "%s", VMA(1) );

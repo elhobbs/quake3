@@ -271,6 +271,15 @@ int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projectio
 	vec3_t			v1, v2;
 	int				*indexes;
 
+#if 0 //def Q3_STATIC
+	void *p0 = __builtin_return_address(0);
+	void *p1 = __builtin_return_address(1);
+	void *p2 = __builtin_return_address(2);
+	printf("%08x %08x %08x\n", p0, p1, p2);
+	printf("R_MarkFragments: %d %d %d\n", numPoints, maxPoints, maxFragments);
+	while (1);
+#endif
+
 	//increment view count for double check prevention
 	tr.viewCount++;
 

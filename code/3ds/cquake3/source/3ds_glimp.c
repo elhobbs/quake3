@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //#include "kitten_bin.h"
 
+#define CLEAR_COLOR 0x68B0D8FF
 
 qboolean ( * qwglSwapIntervalEXT)( int interval );
 void ( * qglMultiTexCoord2fARB )( GLenum texture, float s, float t );
@@ -39,7 +40,9 @@ void ( * qglUnlockArraysEXT) ( void );
 void		GLimp_EndFrame( void ) {
 	gpuFrameEnd();
 	ctr_rend_buffer_reset();
-	DBGPRINT("--------end frame -------\n\n");
+	printf("--------end frame -------\n\n");
+
+	gpuClearBuffers(CLEAR_COLOR);
 
 	gpuFrameBegin();
 }
@@ -55,6 +58,7 @@ void 		GLimp_Init( void )
 	glConfig.deviceSupportsGamma = qfalse;
 	glConfig.displayFrequency = 60;
 	glConfig.windowAspect = 400.0f / 240.0f;
+	glConfig.maxActiveTextures = 3;
 	ri.Cvar_Set("r_picmip", "2");
 	qglLockArraysEXT = glLockArraysEXT;
 	qglUnlockArraysEXT = glUnlockArraysEXT;
@@ -65,7 +69,6 @@ void 		GLimp_Init( void )
 	// Bind the shader program
 	glUseProgram(0);
 
-#define CLEAR_COLOR 0x68B0D8FF
 	gpuClearBuffers(CLEAR_COLOR);
 
 	gpuFrameBegin();

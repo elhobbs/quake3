@@ -441,7 +441,7 @@ void Controls_GetConfig( void );
 void Controls_SetConfig(qboolean restart);
 void Controls_SetDefaults( void );
 
-#if 1
+#ifdef Q3_STATIC
 #define trap_PC_AddGlobalDefine ui_trap_PC_AddGlobalDefine
 #define trap_PC_LoadSource ui_trap_PC_LoadSource
 #define trap_PC_FreeSource ui_trap_PC_FreeSource

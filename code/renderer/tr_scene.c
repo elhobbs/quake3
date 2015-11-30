@@ -51,6 +51,8 @@ void R_ToggleSmpFrame( void ) {
 		tr.smpFrame = 0;
 	}
 
+	printf("R_ToggleSmpFrame %d %d\n", r_numpolyverts, r_numpolys);
+
 	backEndData[tr.smpFrame]->commands.used = 0;
 
 	r_firstSceneDrawSurf = 0;
@@ -104,8 +106,10 @@ void R_AddPolygonSurfaces( void ) {
 	tr.shiftedEntityNum = tr.currentEntityNum << QSORT_ENTITYNUM_SHIFT;
 
 	for ( i = 0, poly = tr.refdef.polys; i < tr.refdef.numPolys ; i++, poly++ ) {
-		sh = R_GetShaderByHandle( poly->hShader );
-		R_AddDrawSurf( ( void * )poly, sh, poly->fogIndex, qfalse );
+		if (poly->surfaceType == SF_MAX) {
+			sh = R_GetShaderByHandle(poly->hShader);
+			R_AddDrawSurf((void *)poly, sh, poly->fogIndex, qfalse);
+		}
 	}
 }
 
@@ -121,6 +125,8 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 	int			fogIndex;
 	fog_t		*fog;
 	vec3_t		bounds[2];
+	void *p0 = __builtin_return_address(0);
+	printf("RE_AddPolyToScene: %08x %d %d\n", p0, hShader, numVerts);
 
 	if ( !tr.registered ) {
 		return;
@@ -139,6 +145,11 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
       since we don't plan on changing the const and making for room for those effects
       simply cut this message to developer only
       */
+			printf("r_numpolyverts: %d\n", r_numpolyverts);
+			printf("numVerts: %d\n", numVerts);
+			printf("max_polyverts: %d\n", max_polyverts);
+			printf("r_numpolys: %d\n", r_numpolys);
+			printf("max_polys: %d\n", max_polys);
 			ri.Printf( PRINT_DEVELOPER, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n");
 			return;
 		}

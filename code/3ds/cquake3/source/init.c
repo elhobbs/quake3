@@ -5,34 +5,38 @@
 #include <3ds/types.h>
 #include <3ds/svc.h>
 
-void(*__system_retAddr)(void);
+#if 1
+u32 __stacksize__ = 1024 * 1024;
 
-// Data from _prm structure
-extern void* __service_ptr; // used to detect if we're run from a homebrew launcher
+extern char* fake_heap_start;
+extern char* fake_heap_end;
+extern u32 __heap_size, __linear_heap_size;
+extern u32 __linear_heap;
+extern u32 __heapBase;
 
-void __system_allocateHeaps();
-void __system_initArgv();
-void __appInit();
+#if 1
+void __system_allocateHeaps() {
+	u32 total_size;
+	u32 tmp = 0;
 
-extern u32 __stacksize__;
+	//increase linear size for hax 2.5
+	total_size = __heap_size + __linear_heap_size;
+	if (total_size > (40 * 1024 * 1024)) {
+		//__linear_heap_size = 32 * 1024 * 1024;
+		//__heap_size = total_size - __linear_heap_size;// -(128 * 1024);
+	}
 
+	// Allocate the application heap
+	__heapBase = 0x08000000;
+	svcControlMemory(&tmp, __heapBase, 0x0, __heap_size, MEMOP_ALLOC, MEMPERM_READ | MEMPERM_WRITE);
 
-void __ctru_exit(int rc);
-int __libctru_gtod(struct _reent *ptr, struct timeval *tp, struct timezone *tz);
-
-void __libctru_init(void(*retAddr)(void))
-{
-	//increase stack
-	__stacksize__ = 128 * 1024;
-	// Register newlib exit() syscall
-	__syscalls.exit = __ctru_exit;
-	__syscalls.gettod_r = __libctru_gtod;
-
-	__system_retAddr = __service_ptr ? retAddr : NULL;
-
-	__system_allocateHeaps();
-
-	// Build argc/argv if present
-	__system_initArgv();
+	// Allocate the linear heap
+	svcControlMemory(&__linear_heap, 0x0, 0x0, __linear_heap_size, MEMOP_ALLOC_LINEAR, MEMPERM_READ | MEMPERM_WRITE);
+	// Set up newlib heap
+	fake_heap_start = (char*)__heapBase;
+	fake_heap_end = fake_heap_start + __heap_size;
 
 }
+#endif
+
+#endif

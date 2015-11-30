@@ -111,6 +111,7 @@ void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean norm
 void glClientActiveTexture(GLenum texture);
 
 void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
+void glDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices, GLint basevertex);
 
 void glGenBuffers(GLsizei n, GLuint *buffers);
 void glBindBuffer(GLenum target, GLuint buffer);

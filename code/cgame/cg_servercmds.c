@@ -504,7 +504,7 @@ typedef struct headModelVoiceChat_s
 	int voiceChatNum;
 } headModelVoiceChat_t;
 
-voiceChatList_t voiceChatLists[MAX_VOICEFILES];
+voiceChatList_t *voiceChatLists = 0;// [MAX_VOICEFILES];
 headModelVoiceChat_t headModelVoiceChat[MAX_HEADMODELS];
 
 /*
@@ -616,6 +616,14 @@ CG_LoadVoiceChats
 void CG_LoadVoiceChats( void ) {
 	int size;
 
+	//voiceChatList_t *voiceChatLists = 0;// [MAX_VOICEFILES];
+	if (voiceChatLists == 0) {
+		voiceChatLists = (voiceChatList_t *)malloc(sizeof(voiceChatList_t)*MAX_VOICEFILES);
+		if (voiceChatLists == 0) {
+			CG_Printf("voiceChatLists failed = %d\n", sizeof(voiceChatList_t)*MAX_VOICEFILES);
+			while (1);
+		}
+	}
 	size = trap_MemoryRemaining();
 	CG_ParseVoiceChats( "scripts/female1.voice", &voiceChatLists[0], MAX_VOICECHATS );
 	CG_ParseVoiceChats( "scripts/female2.voice", &voiceChatLists[1], MAX_VOICECHATS );
@@ -664,7 +672,7 @@ int CG_HeadModelVoiceChats( char *filename ) {
 	}
 
 	for ( i = 0; i < MAX_VOICEFILES; i++ ) {
-		if ( !Q_stricmp(token, voiceChatLists[i].name) ) {
+		if (voiceChatLists && !Q_stricmp(token, voiceChatLists[i].name) ) {
 			return i;
 		}
 	}
@@ -728,7 +736,7 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
 		}
 		// find the voice file for the head model the client uses
 		for ( i = 0; i < MAX_HEADMODELS; i++ ) {
-			if (!Q_stricmp(headModelVoiceChat[i].headmodel, headModelName)) {
+			if (voiceChatLists && !Q_stricmp(headModelVoiceChat[i].headmodel, headModelName)) {
 				break;
 			}
 		}
@@ -737,7 +745,7 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
 		}
 		// find a <headmodelname>.vc file
 		for ( i = 0; i < MAX_HEADMODELS; i++ ) {
-			if (!strlen(headModelVoiceChat[i].headmodel)) {
+			if (voiceChatLists && !strlen(headModelVoiceChat[i].headmodel)) {
 				Com_sprintf(filename, sizeof(filename), "scripts/%s.vc", headModelName);
 				voiceChatNum = CG_HeadModelVoiceChats(filename);
 				if (voiceChatNum == -1)
@@ -753,7 +761,7 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
 	for (k = 0; k < 2; k++) {
 		// just pick the first with the right gender
 		for ( i = 0; i < MAX_VOICEFILES; i++ ) {
-			if (strlen(voiceChatLists[i].name)) {
+			if (voiceChatLists && strlen(voiceChatLists[i].name)) {
 				if (voiceChatLists[i].gender == gender) {
 					// store this head model with voice chat for future reference
 					for ( j = 0; j < MAX_HEADMODELS; j++ ) {

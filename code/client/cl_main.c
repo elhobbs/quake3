@@ -619,8 +619,10 @@ void CL_ShutdownAll(void) {
 		re.Shutdown( qfalse );		// don't destroy window or context
 	}
 
+#ifdef _3DS
 	printf("CL_ShutdownAll\n");
 	svcSleepThread(2000000000);
+#endif
 
 	cls.uiStarted = qfalse;
 	cls.cgameStarted = qfalse;
@@ -674,6 +676,8 @@ void CL_MapLoading( void ) {
 	Con_Close();
 	cls.keyCatchers = 0;
 
+	printf("CL_MapLoading: %d %08x\n", cls.state, cls.servername);
+
 	// if we are already connected to the local host, stay connected
 	if ( cls.state >= CA_CONNECTED && !Q_stricmp( cls.servername, "localhost" ) ) {
 		cls.state = CA_CONNECTED;		// so the connect screen is drawn
@@ -685,16 +689,21 @@ void CL_MapLoading( void ) {
 	} else {
 		// clear nextmap so the cinematic shutdown doesn't execute it
 		Cvar_Set( "nextmap", "" );
+		printf("CL_Disconnect\n");
 		CL_Disconnect( qtrue );
 		Q_strncpyz( cls.servername, "localhost", sizeof(cls.servername) );
 		cls.state = CA_CHALLENGING;		// so the connect screen is drawn
 		cls.keyCatchers = 0;
+		printf("+++SCR_UpdateScreen\n");
 		SCR_UpdateScreen();
+		printf("---SCR_UpdateScreen\n");
 		clc.connectTime = -RETRANSMIT_TIMEOUT;
 		NET_StringToAdr( cls.servername, &clc.serverAddress);
 		// we don't need a challenge on the localhost
 
+		printf("CL_CheckForResend: %d %08x\n", cls.state, cls.servername);
 		CL_CheckForResend();
+		printf("CL_CheckForResend done\n");
 	}
 }
 
@@ -751,7 +760,9 @@ void CL_Disconnect( qboolean showMainMenu ) {
 		VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NONE );
 	}
 
+	printf("SCR_StopCinematic\n");
 	SCR_StopCinematic ();
+	printf("S_ClearSoundBuffer\n");
 	S_ClearSoundBuffer();
 
 	// send a disconnect message to the server
@@ -763,6 +774,7 @@ void CL_Disconnect( qboolean showMainMenu ) {
 		CL_WritePacket();
 	}
 	
+	printf("CL_ClearState\n");
 	CL_ClearState ();
 
 	// wipe the client connection
@@ -775,6 +787,7 @@ void CL_Disconnect( qboolean showMainMenu ) {
 
 	// not connected to a pure server anymore
 	cl_connectedToPureServer = qfalse;
+	printf("CL_Disconnect done\n");
 }
 
 
@@ -1077,6 +1090,8 @@ void CL_Connect_f( void ) {
 		clc.serverAddress.ip[2], clc.serverAddress.ip[3],
 		BigShort( clc.serverAddress.port ) );
 
+	while (1);
+
 	// if we aren't playing on a lan, we need to authenticate
 	// with the cd key
 	if ( NET_IsLocalAddress( clc.serverAddress ) ) {
@@ -1205,8 +1220,10 @@ void CL_Vid_Restart_f( void ) {
 	// reinitialize the filesystem if the game directory or checksum has changed
 	FS_ConditionalRestart( clc.checksumFeed );
 
+#ifdef _3DS
 	printf("CL_Vid_Restart_f\n");
 	svcSleepThread(2000000000);
+#endif
 
 	cls.rendererStarted = qfalse;
 	cls.uiStarted = qfalse;
@@ -2146,9 +2163,10 @@ This is the only place that any of these functions are called from
 ============================
 */
 void CL_StartHunkUsers( void ) {
+#ifdef _3DS
 	printf("CL_StartHunkUsers\n");
 	svcSleepThread(2000000000);
-
+#endif
 	if (!com_cl_running) {
 		return;
 	}

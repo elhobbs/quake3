@@ -769,6 +769,12 @@ The ui module is making a system call
 ====================
 */
 int CL_UISystemCalls( int *args ) {
+#ifdef Q3_STATIC
+	void *p0 = __builtin_return_address(0);
+	void *p1 = __builtin_return_address(1);
+	void *p2 = __builtin_return_address(2);
+#endif
+	//printf("CL_UISystemCalls: %d\n", args[0]);
 	switch( args[0] ) {
 	case UI_ERROR:
 		Com_Error( ERR_DROP, "%s", VMA(1) );
@@ -866,6 +872,7 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
 	case UI_R_ADDPOLYTOSCENE:
+		printf("UI_R_ADDPOLYTOSCENE: %08x\n", p0);
 		re.AddPolyToScene( args[1], args[2], VMA(3), 1 );
 		return 0;
 
@@ -1085,7 +1092,6 @@ int CL_UISystemCalls( int *args ) {
 		return Com_RealTime( VMA(1) );
 
 	case UI_CIN_PLAYCINEMATIC:
-	  Com_DPrintf("UI_CIN_PlayCinematic\n");
 	  return CIN_PlayCinematic(VMA(1), args[2], args[3], args[4], args[5], args[6]);
 
 	case UI_CIN_STOPCINEMATIC:

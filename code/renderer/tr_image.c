@@ -32,8 +32,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #define JPEG_INTERNALS
+#ifdef _3DS
 #include <jpeglib.h>
-
+#define JGLOBAL(x) GLOBAL(x)
+#else
+#include "../jpeg-6/jpeglib.h"
+#define JGLOBAL(x) GLOBAL x
+#endif
 
 static void LoadBMP( const char *name, byte **pic, int *width, int *height );
 static void LoadTGA( const char *name, byte **pic, int *width, int *height );
@@ -1424,7 +1429,11 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
   /* Step 2: specify data source (eg, a file) */
 
   waitforit("LoadJPG 4");
+#ifdef _3DS
   jpeg_mem_src(&cinfo, fbuffer, length);
+#else
+  jpeg_stdio_src(&cinfo, fbuffer);
+#endif
 
   /* Step 3: read file parameters with jpeg_read_header() */
 
@@ -1437,6 +1446,9 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
    */
 
   /* Step 4: set parameters for decompression */
+#ifdef _3DS
+  cinfo.out_color_space = JCS_EXT_RGBA;
+#endif
 
   /* In this example, we don't need to change any of the defaults set by
    * jpeg_read_header(), so we do nothing here.
@@ -1455,13 +1467,14 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
    * output image dimensions available, as well as the output colormap
    * if we asked for color quantization.
    * In this example, we need to make an output work buffer of the right size.
-   */ 
+   */
+
   /* JSAMPLEs per row in output buffer */
   waitforit("LoadJPG 7");
   row_stride = cinfo.output_width * cinfo.output_components;
 
   waitforit("LoadJPG 8");
-  out = ri.Malloc(cinfo.output_width*cinfo.output_height*cinfo.output_components*2);
+  out = ri.Malloc(cinfo.output_width*cinfo.output_height*cinfo.output_components);
 
   waitforit("LoadJPG 9");
   *pic = out;
@@ -1486,7 +1499,7 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
   }
 
   waitforit("LoadJPG B");
-  // clear all the alphas to 255
+  /*// clear all the alphas to 255
   {
 	  int	i, j;
 		byte	*buf;
@@ -1497,7 +1510,7 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
 	  for ( i = 3 ; i < j ; i+=4 ) {
 		  buf[i] = 255;
 	  }
-  }
+  }*/
 
   /* Step 7: Finish decompression */
 
@@ -1600,7 +1613,7 @@ boolean empty_output_buffer (j_compress_ptr cinfo)
  * wrong thing.
  */
 
-GLOBAL(void)
+JGLOBAL(void)
 jpeg_start_compress (j_compress_ptr cinfo, boolean write_all_tables)
 {
   if (cinfo->global_state != CSTATE_START)
@@ -1639,7 +1652,7 @@ jpeg_start_compress (j_compress_ptr cinfo, boolean write_all_tables)
  * when using a multiple-scanline buffer.
  */
 
-GLOBAL(JDIMENSION)
+JGLOBAL(JDIMENSION)
 jpeg_write_scanlines (j_compress_ptr cinfo, JSAMPARRAY scanlines,
 		      JDIMENSION num_lines)
 {

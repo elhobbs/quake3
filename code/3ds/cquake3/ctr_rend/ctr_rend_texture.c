@@ -1,11 +1,13 @@
 #include "ctr_rend.h"
 #include <stdlib.h>
+#ifdef _3DS
 #include <3ds/linear.h>
 #include <3ds/os.h>
 #include <3ds/gpu/gx.h>
 #include <3ds/services/gsp.h>
 #include <3ds/svc.h>
 #include <3ds/gfx.h>
+#endif
 
 void glGenTextures(GLsizei n, GLuint * textures) {
 	if (n <= 0 || textures == 0) {
@@ -48,6 +50,7 @@ static void myGPU_SetTexture(GPU_TEXUNIT unit, u32 data, u16 width, u16 height, 
 	u32 icolor = colorType;
 	DBGPRINT("set: %d %d %d %d %08x %08x\n", ctr_state.client_texture_current, iwidth, iheight, icolor, data, data >> 3);
 	//svcSleepThread(1000000000);
+#ifdef _3DS
 	switch (unit)
 	{
 	case GPU_TEXUNIT0:
@@ -71,6 +74,7 @@ static void myGPU_SetTexture(GPU_TEXUNIT unit, u32 data, u16 width, u16 height, 
 		GPUCMD_AddWrite(GPUREG_TEXUNIT2_PARAM, param);
 		break;
 	}
+#endif
 }
 void glBindTexture(GLenum target, GLuint texture) {
 	DBGPRINT("bind texture: %08x\n", texture);
@@ -89,6 +93,7 @@ void glBindTexture(GLenum target, GLuint texture) {
 	}
 	DBGPRINT("bound texture: %d %08x\n", ctr_state.client_texture_current, texture);
 	ctr_state.bound_texture[ctr_state.client_texture_current] = texture;
+#ifdef _3DS
 	if (tx->data) {
 		myGPU_SetTexture(
 			__tmu[ctr_state.client_texture_current],
@@ -99,6 +104,7 @@ void glBindTexture(GLenum target, GLuint texture) {
 			tx->format // Pixel format
 			);
 	}
+#endif
 }
 
 void glClientActiveTexture(GLenum texture) {
@@ -136,6 +142,7 @@ int is_supported_size(int size) {
 	return 0;
 }
 
+
 void tex_copy(u32 *inaddr, u32 *outaddr, u32 indim, u32 outdim, u32 flags, u32 size, u32 inlinewidth, u32 outlinewidth) {
 	*((u32 *)0x1EF00C00) = ((u32)osConvertVirtToPhys((u32)inaddr)) >> 3;
 	*((u32 *)0x1EF00C04) = ((u32)osConvertVirtToPhys((u32)outaddr)) >> 3;
@@ -151,7 +158,15 @@ void tex_copy(u32 *inaddr, u32 *outaddr, u32 indim, u32 outdim, u32 flags, u32 s
 	*((u32 *)0x1EF00C18) |= 1;
 }
 
-static u8 tileOrder[] = { 0, 1, 8, 9, 2, 3, 10, 11, 16, 17, 24, 25, 18, 19, 26, 27, 4, 5, 12, 13, 6, 7, 14, 15, 20, 21, 28, 29, 22, 23, 30, 31, 32, 33, 40, 41, 34, 35, 42, 43, 48, 49, 56, 57, 50, 51, 58, 59, 36, 37, 44, 45, 38, 39, 46, 47, 52, 53, 60, 61, 54, 55, 62, 63 };
+static u8 tileOrder[] = {
+	 0,  1,  8,  9,  2,  3, 10, 11,
+	16, 17, 24, 25, 18, 19, 26, 27,
+	 4,  5, 12, 13,  6,  7, 14, 15,
+	20, 21, 28, 29, 22, 23, 30, 31,
+	32, 33, 40, 41, 34, 35, 42, 43, 
+	48, 49, 56, 57, 50, 51, 58, 59,
+	36, 37, 44, 45, 38, 39, 46, 47,
+	52, 53, 60, 61, 54, 55, 62, 63 };
 static unsigned long htonl(unsigned long v)
 {
 	u8* v2 = (u8*)&v;
@@ -190,6 +205,41 @@ void tileImage32(u32* src, u32* dst, int width, int height)
 		}
 	}
 }
+
+#if 0
+void copy_tex_block_rgba_5551(u32 *src, u16 *dst, int width, int height, int dst_stride, int row_stride) {
+	int w, h;
+	u32 *row_src = src;
+	u16 *row_dst = dst;
+	for (h = 0; h < height; h++) {
+		for (w = 0; w < width; w++) {
+			u32 v = row_src[w];
+			int a = (v >> 24) & 0xff;
+			int b = (v >> 16) & 0xff;
+			int g = (v >> 8) & 0xff;
+			int r = (v >> 0) & 0xff;
+			row_dst[w] = RGBA5551(r, g, b, (a ? 1 : 0));
+		}
+		row_src += row_stride;
+		row_dst += dst_stride;
+	}
+}
+
+void copy_tex_rgba_5551(u32 *src, u16 *dst, int width, int height) {
+	int w, h;
+	u32 *row_src = src;
+	u16 *row_dst = dst;
+	for (h = 0; h < height; h++) {
+		for (w = 0; w < width; w++) {
+			int x = w + tileOrder[k] % 8;
+			int y = j + (tileOrder[k] - (x - w)) / 8;
+			u32 v = src[x + (height - 1 - y)*width];
+			row_src += (8 * 8);
+		}
+	}
+}
+
+#endif // 0
 
 void glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid * data) {
 	//TODO support mipmaps
@@ -271,23 +321,51 @@ void glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei widt
 	}
 	tx->width = width;
 	tx->height = height;
-	tx->format = GPU_RGBA5551;// _format;
+	tx->format = _format;
 
+	if (data == 0) {
+		return;
+	}
+
+	switch (type) {
+	case GL_UNSIGNED_BYTE:
+		switch (format) {
+		case GL_RGB:
+			copy_tex_rgb_rgb(tx, data, width, height);
+			break;
+		case GL_RGBA:
+			copy_tex_rgba_rgba(tx, data, width, height);
+			break;
+		case GL_LUMINANCE:
+			copy_tex_8_8(tx, data, width, height);
+			break;
+		case GL_LUMINANCE_ALPHA:
+			copy_tex_8_8(tx, data, width, height);
+			break;
+		}
+		break;
+	case GL_UNSIGNED_SHORT_5_6_5:
+		break;
+	case GL_UNSIGNED_SHORT_4_4_4_4:
+		break;
+	case GL_UNSIGNED_SHORT_5_5_5_1:
+		break;
+	}
 	//copy data if provided
-	if (data) {
+	//if (data) {
 		//memcpy(tx->data, data, _size);
-		tileImage32(data, tx->data, width, height);
-	}
-	if (tx->data) {
-		myGPU_SetTexture(
-			__tmu[ctr_state.client_texture_current],
-			osConvertVirtToPhys((u32)tx->data),
-			tx->width, // Width
-			tx->height, // Height
-			GPU_TEXTURE_MAG_FILTER(GPU_LINEAR) | GPU_TEXTURE_WRAP_S(GPU_REPEAT) | GPU_TEXTURE_WRAP_T(GPU_REPEAT), // Flags
-			tx->format // Pixel format
-			);
-	}
+		//tileImage32(data, tx->data, width, height);
+	//}
+#ifdef _3DS
+	myGPU_SetTexture(
+		__tmu[ctr_state.client_texture_current],
+		osConvertVirtToPhys((u32)tx->data),
+		tx->width, // Width
+		tx->height, // Height
+		GPU_TEXTURE_MAG_FILTER(GPU_LINEAR) | GPU_TEXTURE_WRAP_S(GPU_REPEAT) | GPU_TEXTURE_WRAP_T(GPU_REPEAT), // Flags
+		tx->format // Pixel format
+		);
+#endif
 }
 
 void glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels) {
@@ -344,49 +422,44 @@ void glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, G
 		return;
 	}
 
-	int full_width = tx->width;
-	int full_height = tx->height;
-	int w, h;
-	int stride_dst = full_width * _size;
-	int stride_src = width * _size;
-
 #if 1
-	tileImage32(pixels, tx->data, width, height);
-#else
-	GLubyte *row_dst = tx->data + (stride_dst * yoffset) + (_size*xoffset);
-	GLubyte *row_src = pixels;
-	for (h = 0; h < height; h++) {
-		memcpy(row_dst, row_src, stride_src);
-		row_dst += stride_dst;
-		row_src += stride_src;
-	}
-#endif
-
-	u16* bufAdr = gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, NULL, NULL);
-	u8 *src = pixels;
-	u16 *dst = tx->data;
-
-	for (w = 0; w<-width && w < 320; w++)
-	{
-		for (h = 0; h<height && h < 240; h++)
-		{
-			u32 v = (w * 240) + (239 - h);
-			u32 v1 = (h * width + w) * 4;
-			int r = src[v1+0];
-			int g = src[v1+1];
-			int b = src[v1+2];
-			int a = src[v1+3];
-			bufAdr[v] = RGB8_to_565(r, g, b);
+	switch (type) {
+	case GL_UNSIGNED_BYTE:
+		switch (format) {
+		case GL_RGB:
+			copy_tex_sub_rgb_rgb(tx, pixels, xoffset, yoffset, width, height);
+			break;
+		case GL_RGBA:
+			copy_tex_sub_rgba_rgba(tx, pixels, xoffset, yoffset, width, height);
+			break;
+		case GL_LUMINANCE:
+			copy_tex_sub_8_8(tx, pixels, xoffset, yoffset, width, height);
+			break;
+		case GL_LUMINANCE_ALPHA:
+			copy_tex_sub_8_8(tx, pixels, xoffset, yoffset, width, height);
+			break;
 		}
+		break;
+	case GL_UNSIGNED_SHORT_5_6_5:
+		break;
+	case GL_UNSIGNED_SHORT_4_4_4_4:
+		break;
+	case GL_UNSIGNED_SHORT_5_5_5_1:
+		break;
 	}
-	if (tx->data) {
-		myGPU_SetTexture(
-			__tmu[ctr_state.client_texture_current],
-			osConvertVirtToPhys((u32)tx->data),
-			tx->width, // Width
-			tx->height, // Height
-			GPU_TEXTURE_MAG_FILTER(GPU_LINEAR) | GPU_TEXTURE_WRAP_S(GPU_REPEAT) | GPU_TEXTURE_WRAP_T(GPU_REPEAT), // Flags
-			tx->format // Pixel format
-			);
-	}
-	}
+
+
+#else
+	tileImage32(pixels, tx->data, width, height);
+#endif
+#ifdef _3DS
+	myGPU_SetTexture(
+		__tmu[ctr_state.client_texture_current],
+		osConvertVirtToPhys((u32)tx->data),
+		tx->width, // Width
+		tx->height, // Height
+		GPU_TEXTURE_MAG_FILTER(GPU_LINEAR) | GPU_TEXTURE_WRAP_S(GPU_REPEAT) | GPU_TEXTURE_WRAP_T(GPU_REPEAT), // Flags
+		tx->format // Pixel format
+		);
+#endif
+}

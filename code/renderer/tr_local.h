@@ -1271,8 +1271,13 @@ typedef struct stageVars
 typedef struct shaderCommands_s 
 {
 	glIndex_t	indexes[SHADER_MAX_INDEXES];
+#ifdef _3DS
+	vec3_t		xyz[SHADER_MAX_VERTEXES];
+	vec3_t		normal[SHADER_MAX_VERTEXES];
+#else
 	vec4_t		xyz[SHADER_MAX_VERTEXES];
 	vec4_t		normal[SHADER_MAX_VERTEXES];
+#endif
 	vec2_t		texCoords[SHADER_MAX_VERTEXES][2];
 	color4ub_t	vertexColors[SHADER_MAX_VERTEXES];
 	int			vertexDlightBits[SHADER_MAX_VERTEXES];
@@ -1545,7 +1550,10 @@ typedef struct {
 	int width;
 	int height;
 	char *fileName;
-	qboolean jpeg;
+	union {
+		qboolean jpeg;
+		int dummy;
+	};
 } screenshotCommand_t;
 
 typedef enum {
@@ -1573,8 +1581,8 @@ typedef struct {
 	drawSurf_t	drawSurfs[MAX_DRAWSURFS];
 	dlight_t	dlights[MAX_DLIGHTS];
 	trRefEntity_t	entities[MAX_ENTITIES];
-	srfPoly_t	*polys;//[MAX_POLYS];
-	polyVert_t	*polyVerts;//[MAX_POLYVERTS];
+	srfPoly_t	polys[MAX_POLYS];
+	polyVert_t	polyVerts[MAX_POLYVERTS];
 	renderCommandList_t	commands;
 } backEndData_t;
 

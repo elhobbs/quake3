@@ -359,18 +359,23 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 
 	// if not running a dedicated server CL_MapLoading will connect the client to the server
 	// also print some status stuff
+	printf("CL_MapLoading\n");
 	CL_MapLoading();
 
 	// make sure all the client stuff is unloaded
+	printf("CL_ShutdownAll\n");
 	CL_ShutdownAll();
 
 	// clear the whole hunk because we're (re)loading the server
+	printf("Hunk_Clear\n");
 	Hunk_Clear();
 
 	// clear collision map data
+	printf("CM_ClearMap\n");
 	CM_ClearMap();
 
 	// init client structures and svs.numSnapshotEntities 
+	printf("SV_Startup\n");
 	if ( !Cvar_VariableValue("sv_running") ) {
 		SV_Startup();
 	} else {
@@ -381,6 +386,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	}
 
 	// clear pak references
+	printf("FS_ClearPakReferences\n");
 	FS_ClearPakReferences(0);
 
 	// allocate the snapshot entities on the hunk
@@ -397,6 +403,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 //	Cvar_Set( "nextmap", va("map %s", server) );
 
 	// wipe the entire per-level structure
+	printf("SV_ClearServer\n");
 	SV_ClearServer();
 	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
 		sv.configstrings[i] = CopyString("");
@@ -408,8 +415,10 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	// get a new checksum feed and restart the file system
 	srand(Com_Milliseconds());
 	sv.checksumFeed = ( ((int) rand() << 16) ^ rand() ) ^ Com_Milliseconds();
+	printf("FS_Restart\n");
 	FS_Restart( sv.checksumFeed );
 
+	printf("CM_LoadMap\n");
 	CM_LoadMap( va("maps/%s.bsp", server), qfalse, &checksum );
 
 	// set serverinfo visible name
@@ -424,6 +433,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
 
 	// clear physics interaction links
+	printf("SV_ClearWorld\n");
 	SV_ClearWorld ();
 	
 	// media configstring setting should be done during
@@ -432,6 +442,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	sv.state = SS_LOADING;
 
 	// load and spawn all other entities
+	printf("SV_InitGameProgs\n");
 	SV_InitGameProgs();
 
 	// don't allow a map_restart if game is modified
@@ -439,12 +450,14 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 
 	// run a few frames to allow everything to settle
 	for ( i = 0 ;i < 3 ; i++ ) {
+		printf("GAME_RUN_FRAME\n");
 		VM_Call( gvm, GAME_RUN_FRAME, svs.time );
 		SV_BotFrame( svs.time );
 		svs.time += 100;
 	}
 
 	// create a baseline for more efficient communications
+	printf("SV_CreateBaseline\n");
 	SV_CreateBaseline ();
 
 	for (i=0 ; i<sv_maxclients->integer ; i++) {
@@ -495,6 +508,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	}	
 
 	// run another frame to allow things to look at all the players
+	printf("GAME_RUN_FRAME\n");
 	VM_Call( gvm, GAME_RUN_FRAME, svs.time );
 	SV_BotFrame( svs.time );
 	svs.time += 100;
@@ -541,8 +555,10 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	sv.state = SS_GAME;
 
 	// send a heartbeat now so the master will get up to date info
+	printf("SV_Heartbeat_f\n");
 	SV_Heartbeat_f();
 
+	printf("Hunk_SetMark\n");
 	Hunk_SetMark();
 
 	Com_Printf ("-----------------------------------\n");
@@ -581,7 +597,13 @@ void SV_Init (void) {
 	Cvar_Get ("sv_cheats", "1", CVAR_SYSTEMINFO | CVAR_ROM );
 	sv_serverid = Cvar_Get ("sv_serverid", "0", CVAR_SYSTEMINFO | CVAR_ROM );
 #ifndef DLL_ONLY // bk010216 - for DLL-only servers
+
+#ifdef _3DS
+	sv_pure = Cvar_Get("sv_pure", "0", CVAR_SYSTEMINFO);
+#else
 	sv_pure = Cvar_Get ("sv_pure", "1", CVAR_SYSTEMINFO );
+#endif
+
 #else
 	sv_pure = Cvar_Get ("sv_pure", "0", CVAR_SYSTEMINFO | CVAR_INIT | CVAR_ROM );
 #endif

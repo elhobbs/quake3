@@ -765,7 +765,7 @@ extern	vmCvar_t	g_enableBreath;
 extern	vmCvar_t	g_singlePlayer;
 extern	vmCvar_t	g_proxMineTimeout;
 
-#if 1
+#ifdef Q3_STATIC
 #define dllEntry game_dllEntry
 #define vmMain game_vmMain
 #define PASSFLOAT game_PASSFLOAT

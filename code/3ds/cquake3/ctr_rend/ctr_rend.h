@@ -1,7 +1,15 @@
 #pragma once
 
+#ifdef _3DS
 #include <3ds\types.h>
 #include <3ds\gpu\gpu.h>
+#include <3ds/linear.h>
+#endif
+
+#ifdef _WIN32
+#include "wintypes.h"
+#endif
+
 #include "3dmath.h"
 #include "gl.h"
 #include "ctr_lists.h"
@@ -149,3 +157,15 @@ void ctr_rend_matrix_init();
 void ctr_rend_buffer_init();
 void ctr_rend_init();
 extern CTR_CLIENT_STATE ctr_state;
+
+
+void copy_tex_rgb_rgb(CTR_TEXTURE *dst, u8 *src, int width, int height);
+void copy_tex_rgba_rgba(CTR_TEXTURE *dst, u8 *src, int width, int height);
+void copy_tex_rgb_5551(CTR_TEXTURE *dst, u8 *src, int width, int height);
+void copy_tex_rgba_5551(CTR_TEXTURE *dst, u8 *src, int width, int height);
+void copy_tex_rgba_4444(CTR_TEXTURE *dst, u8 *src, int width, int height);
+void copy_tex_8_8(CTR_TEXTURE *dst, u8 *src, int width, int height);
+
+void copy_tex_sub_rgb_rgb(CTR_TEXTURE *dst, u8 *src, int x, int y, int width, int height);
+void copy_tex_sub_rgb_5551(CTR_TEXTURE *dst, u8 *src, int x, int y, int width, int height);
+void copy_tex_sub_8_8(CTR_TEXTURE *dst, u8 *src, int x, int y, int width, int height);

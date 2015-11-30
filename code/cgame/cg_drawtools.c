@@ -431,12 +431,9 @@ void CG_ColorForHealth( vec4_t hcolor ) {
 }
 
 
-
-
 // bk001205 - code below duplicated in q3_ui/ui-atoms.c
 // bk001205 - FIXME: does this belong in ui_shared.c?
 // bk001205 - FIXME: HARD_LINKED flags not visible here
-#ifndef Q3_STATIC // bk001205 - q_shared defines not visible here 
 /*
 =================
 UI_DrawProportionalString2
@@ -587,6 +584,140 @@ static int propMapB[26][3] = {
 #define PROPB_GAP_WIDTH		4
 #define PROPB_SPACE_WIDTH	12
 #define PROPB_HEIGHT		36
+
+#ifdef Q3_STATIC
+static void CG_DrawProportionalString2(int x, int y, const char* str, vec4_t color, float sizeScale, qhandle_t charset)
+{
+	const char* s;
+	unsigned char	ch; // bk001204 - unsigned
+	float	ax;
+	float	ay;
+	float	aw;
+	float	ah;
+	float	frow;
+	float	fcol;
+	float	fwidth;
+	float	fheight;
+
+	// draw the colored text
+	trap_R_SetColor(color);
+
+	ax = x * cgs.screenXScale + cgs.screenXBias;
+	ay = y * cgs.screenXScale;
+
+	s = str;
+	while (*s)
+	{
+		ch = *s & 127;
+		if (ch == ' ') {
+			aw = (float)PROP_SPACE_WIDTH * cgs.screenXScale * sizeScale;
+		}
+		else if (propMap[ch][2] != -1) {
+			fcol = (float)propMap[ch][0] / 256.0f;
+			frow = (float)propMap[ch][1] / 256.0f;
+			fwidth = (float)propMap[ch][2] / 256.0f;
+			fheight = (float)PROP_HEIGHT / 256.0f;
+			aw = (float)propMap[ch][2] * cgs.screenXScale * sizeScale;
+			ah = (float)PROP_HEIGHT * cgs.screenXScale * sizeScale;
+			trap_R_DrawStretchPic(ax, ay, aw, ah, fcol, frow, fcol + fwidth, frow + fheight, charset);
+		}
+		else {
+			aw = 0;
+		}
+
+		ax += (aw + (float)PROP_GAP_WIDTH * cgs.screenXScale * sizeScale);
+		s++;
+	}
+
+	trap_R_SetColor(NULL);
+}
+
+int CG_ProportionalStringWidth(const char* str) {
+	const char *	s;
+	int				ch;
+	int				charWidth;
+	int				width;
+
+	s = str;
+	width = 0;
+	while (*s) {
+		ch = *s & 127;
+		charWidth = propMap[ch][2];
+		if (charWidth != -1) {
+			width += charWidth;
+			width += PROP_GAP_WIDTH;
+		}
+		s++;
+	}
+
+	width -= PROP_GAP_WIDTH;
+	return width;
+}
+
+/*
+=================
+CG_DrawProportionalString
+=================
+*/
+void CG_DrawProportionalString(int x, int y, const char* str, int style, vec4_t color) {
+	vec4_t	drawcolor;
+	int		width;
+	float	sizeScale;
+
+	sizeScale = UI_ProportionalSizeScale(style);
+
+	switch (style & UI_FORMATMASK) {
+	case UI_CENTER:
+		width = CG_ProportionalStringWidth(str) * sizeScale;
+		x -= width / 2;
+		break;
+
+	case UI_RIGHT:
+		width = CG_ProportionalStringWidth(str) * sizeScale;
+		x -= width;
+		break;
+
+	case UI_LEFT:
+	default:
+		break;
+	}
+
+	if (style & UI_DROPSHADOW) {
+		drawcolor[0] = drawcolor[1] = drawcolor[2] = 0;
+		drawcolor[3] = color[3];
+		CG_DrawProportionalString2(x + 2, y + 2, str, drawcolor, sizeScale, cgs.media.charsetProp);
+	}
+
+	if (style & UI_INVERSE) {
+		drawcolor[0] = color[0] * 0.8;
+		drawcolor[1] = color[1] * 0.8;
+		drawcolor[2] = color[2] * 0.8;
+		drawcolor[3] = color[3];
+		CG_DrawProportionalString2(x, y, str, drawcolor, sizeScale, cgs.media.charsetProp);
+		return;
+	}
+
+	if (style & UI_PULSE) {
+		drawcolor[0] = color[0] * 0.8;
+		drawcolor[1] = color[1] * 0.8;
+		drawcolor[2] = color[2] * 0.8;
+		drawcolor[3] = color[3];
+		CG_DrawProportionalString2(x, y, str, color, sizeScale, cgs.media.charsetProp);
+
+		drawcolor[0] = color[0];
+		drawcolor[1] = color[1];
+		drawcolor[2] = color[2];
+		drawcolor[3] = 0.5 + 0.5 * sin(cg.time / PULSE_DIVISOR);
+		CG_DrawProportionalString2(x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow);
+		return;
+	}
+
+	CG_DrawProportionalString2(x, y, str, color, sizeScale, cgs.media.charsetProp);
+}
+#endif
+
+
+#ifndef Q3_STATIC // bk001205 - q_shared defines not visible here 
 
 /*
 =================

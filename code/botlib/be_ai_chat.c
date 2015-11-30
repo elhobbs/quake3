@@ -594,7 +594,7 @@ void BotDumpSynonymList(bot_synonymlist_t *synlist)
 //===========================================================================
 bot_synonymlist_t *BotLoadSynonyms(char *filename)
 {
-	int pass, size, contextlevel, numsynonyms;
+	int pass, size, size2, contextlevel, numsynonyms;
 	unsigned long int context, contextstack[32];
 	char *ptr = NULL;
 	source_t *source;
@@ -602,6 +602,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 	bot_synonymlist_t *synlist, *lastsyn, *syn;
 	bot_synonym_t *synonym, *lastsynonym;
 
+	//printf("BotLoadSynonyms: %s\n", filename);
 	size = 0;
 	synlist = NULL; //make compiler happy
 	syn = NULL; //make compiler happy
@@ -609,6 +610,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 	//the synonyms are parsed in two phases
 	for (pass = 0; pass < 2; pass++)
 	{
+		//printf("BotLoadSynonyms: %d %d\n", pass, size);
 		//
 		if (pass && size) ptr = (char *) GetClearedHunkMemory(size);
 		//
@@ -619,6 +621,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 			botimport.Print(PRT_ERROR, "counldn't load %s\n", filename);
 			return NULL;
 		} //end if
+		//printf("source: %08x\n",source);
 		//
 		context = 0;
 		contextlevel = 0;
@@ -627,6 +630,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 		//
 		while(PC_ReadToken(source, &token))
 		{
+			//printf("token type: %d\n", token.type);
 			if (token.type == TT_NUMBER)
 			{
 				context |= token.intvalue;
@@ -646,6 +650,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 			} //end if
 			else if (token.type == TT_PUNCTUATION)
 			{
+				//printf("token: %s\n", token.string);
 				if (!strcmp(token.string, "}"))
 				{
 					contextlevel--;
@@ -659,6 +664,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 				} //end if
 				else if (!strcmp(token.string, "["))
 				{
+					//printf("ptr: %08x %d\n", ptr, sizeof(bot_synonymlist_t));
 					size += sizeof(bot_synonymlist_t);
 					if (pass)
 					{
@@ -675,12 +681,14 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 					lastsynonym = NULL;
 					while(1)
 					{
+						//printf("token: %s\n", token.string);
 						if (!PC_ExpectTokenString(source, "(") ||
 							!PC_ExpectTokenType(source, TT_STRING, 0, &token))
 						{
 							FreeSource(source);
 							return NULL;
 						} //end if
+						//printf("token2: %s\n", token.string);
 						StripDoubleQuotes(token.string);
 						if (strlen(token.string) <= 0)
 						{
@@ -688,13 +696,15 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 							FreeSource(source);
 							return NULL;
 						} //end if
-						size += sizeof(bot_synonym_t) + strlen(token.string) + 1;
+						size2 = strlen(token.string) + 1 + 3;
+						size2 &= ~3;
+						size += sizeof(bot_synonym_t) + size2;
 						if (pass)
 						{
 							synonym = (bot_synonym_t *) ptr;
 							ptr += sizeof(bot_synonym_t);
 							synonym->string = ptr;
-							ptr += strlen(token.string) + 1;
+							ptr += size2;
 							strcpy(synonym->string, token.string);
 							//
 							if (lastsynonym) lastsynonym->next = synonym;
@@ -709,6 +719,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 							FreeSource(source);
 							return NULL;
 						} //end if
+						//printf("pass %08x %08x\n", syn, synonym);
 						if (pass)
 						{
 							synonym->weight = token.floatvalue;
@@ -720,6 +731,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 							FreeSource(source);
 							return NULL;
 						} //end if
+						//printf("end while\n");
 					} //end while
 					if (numsynonyms < 2)
 					{
@@ -736,6 +748,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 				} //end if
 			} //end else if
 		} //end while
+		//printf("FreeSource\n");
 		//
 		FreeSource(source);
 		//
@@ -2956,24 +2969,31 @@ int BotSetupChatAI(void)
 	int starttime = Sys_MilliSeconds();
 #endif //DEBUG
 
+	printf("BotSetupChatAI 1\n");
+
 	file = LibVarString("synfile", "syn.c");
 	synonyms = BotLoadSynonyms(file);
+	printf("BotSetupChatAI 2\n");
 	file = LibVarString("rndfile", "rnd.c");
 	randomstrings = BotLoadRandomStrings(file);
+	printf("BotSetupChatAI 3\n");
 	file = LibVarString("matchfile", "match.c");
 	matchtemplates = BotLoadMatchTemplates(file);
 	//
+	printf("BotSetupChatAI 4\n");
 	if (!LibVarValue("nochat", "0"))
 	{
 		file = LibVarString("rchatfile", "rchat.c");
 		replychats = BotLoadReplyChat(file);
 	} //end if
 
+	printf("BotSetupChatAI 5\n");
 	InitConsoleMessageHeap();
 
 #ifdef DEBUG
 	botimport.Print(PRT_MESSAGE, "setup chat AI %d msec\n", Sys_MilliSeconds() - starttime);
 #endif //DEBUG
+	printf("BotSetupChatAI 6\n");
 	return BLERR_NOERROR;
 } //end of the function BotSetupChatAI
 //===========================================================================

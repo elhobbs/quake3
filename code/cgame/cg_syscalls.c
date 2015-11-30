@@ -28,6 +28,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
+#ifdef Q3_STATIC
+#define syscall cgame_syscall
+#endif
+
 static int (QDECL *syscall)( int arg, ... ) = (int (QDECL *)( int, ...))-1;
 
 
@@ -180,6 +184,13 @@ int		trap_CM_MarkFragments( int numPoints, const vec3_t *points,
 				const vec3_t projection,
 				int maxPoints, vec3_t pointBuffer,
 				int maxFragments, markFragment_t *fragmentBuffer ) {
+#if 0 //def Q3_STATIC
+	void *p0 = __builtin_return_address(0);
+	void *p1 = __builtin_return_address(1);
+	void *p2 = __builtin_return_address(2);
+	printf("%08x 08x 08x\n", p0, p1, p2);
+	printf("syscall(CG_CM_MARKFRAGMENTS): %d %d %d\n", numPoints, maxPoints, maxFragments);
+#endif
 	return syscall( CG_CM_MARKFRAGMENTS, numPoints, points, projection, maxPoints, pointBuffer, maxFragments, fragmentBuffer );
 }
 

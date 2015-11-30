@@ -117,11 +117,13 @@ int	c_blockedOnMain;
 void R_IssueRenderCommands( qboolean runPerformanceCounters ) {
 	renderCommandList_t	*cmdList;
 
+	//printf("here 2c1\n");
 	cmdList = &backEndData[tr.smpFrame]->commands;
 	assert(cmdList); // bk001205
 	// add an end-of-list command
 	*(int *)(cmdList->cmds + cmdList->used) = RC_END_OF_LIST;
 
+	//printf("here 2c2\n");
 	// clear it out, in case this is a sync and not a buffer flip
 	cmdList->used = 0;
 
@@ -139,25 +141,31 @@ void R_IssueRenderCommands( qboolean runPerformanceCounters ) {
 			}
 		}
 
+		//printf("here 2c3\n");
 		// sleep until the renderer has completed
 		GLimp_FrontEndSleep();
 	}
 
+	//printf("here 2c4\n");
 	// at this point, the back end thread is idle, so it is ok
 	// to look at it's performance counters
 	if ( runPerformanceCounters ) {
 		R_PerformanceCounters();
 	}
 
+	//printf("here 2c5\n");
 	// actually start the commands going
 	if ( !r_skipBackEnd->integer ) {
 		// let it start on the new batch
 		if ( !glConfig.smpActive ) {
+			//printf("here 2c6\n");
 			RB_ExecuteRenderCommands( cmdList->cmds );
 		} else {
+			//printf("here 2c7\n");
 			GLimp_WakeRenderer( cmdList );
 		}
 	}
+	//printf("here 2c8\n");
 }
 
 
@@ -191,8 +199,9 @@ make sure there is enough command space, waiting on the
 render thread if needed.
 ============
 */
-void *R_GetCommandBuffer( int bytes ) {
+void *R_GetCommandBuffer( int inbytes ) {
 	renderCommandList_t	*cmdList;
+	int bytes = (inbytes + 3) & (~3);
 
 	cmdList = &backEndData[tr.smpFrame]->commands;
 
@@ -273,10 +282,15 @@ RE_StretchPic
 void RE_StretchPic ( float x, float y, float w, float h, 
 					  float s1, float t1, float s2, float t2, qhandle_t hShader ) {
 	stretchPicCommand_t	*cmd;
+	//void *p0 = __builtin_return_address(0);
+	//printf("RE_StretchPic: %08x\n", p0);
 
   if (!tr.registered) {
     return;
   }
+
+  //printf("RE_StretchPic %3.2f %3.2f %3.2f %3.2f\n%1.3f %1.3f %1.3f %1.3f\n",x,y,w,h,s1,t1,s2,t2);
+
 	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
 	if ( !cmd ) {
 		return;
@@ -420,21 +434,28 @@ Returns the number of msec spent in the back end
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
 	swapBuffersCommand_t	*cmd;
 
+	//printf("here 2a\n");
 	if ( !tr.registered ) {
+		printf("tr.registered == false\n");
 		return;
 	}
+	//printf("here 2b\n");
 	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
 	if ( !cmd ) {
+		printf("R_GetCommandBuffer == 0\n");
 		return;
 	}
 	cmd->commandId = RC_SWAP_BUFFERS;
 
+	//printf("here 2c\n");
 	R_IssueRenderCommands( qtrue );
 
+	//printf("here 2d\n");
 	// use the other buffers next frame, because another CPU
 	// may still be rendering into the current ones
 	R_ToggleSmpFrame();
 
+	//printf("here 2e\n");
 	if ( frontEndMsec ) {
 		*frontEndMsec = tr.frontEndMsec;
 	}
@@ -443,5 +464,6 @@ void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
 		*backEndMsec = backEnd.pc.msec;
 	}
 	backEnd.pc.msec = 0;
+	//printf("here 2f\n");
 }
 

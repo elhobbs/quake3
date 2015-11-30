@@ -24,8 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //=============================================================================
 
 // memory.h
-//#define MEMDEBUG
-#undef MEMDEBUG
+#define MEMDEBUG
+//#undef MEMDEBUG
 
 #ifndef MEMDEBUG
 

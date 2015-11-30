@@ -133,6 +133,9 @@ void QDECL SourceError(source_t *source, char *str, ...)
 	va_start(ap, str);
 	vsprintf(text, str, ap);
 	va_end(ap);
+#ifdef Q3_STATIC
+	printf("file %s, line %d: %s\n", source->scriptstack->filename, source->scriptstack->line, text);
+#endif
 #ifdef BOTLIB
 	botimport.Print(PRT_ERROR, "file %s, line %d: %s\n", source->scriptstack->filename, source->scriptstack->line, text);
 #endif	//BOTLIB

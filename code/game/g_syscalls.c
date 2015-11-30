@@ -28,6 +28,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #error "Do not use in VM build"
 #endif
 
+#ifdef Q3_STATIC
+#define syscall game_syscall
+#endif
+
 static int (QDECL *syscall)( int arg, ... ) = (int (QDECL *)( int, ...))-1;
 
 
@@ -224,6 +228,7 @@ int trap_RealTime( qtime_t *qtime ) {
 }
 
 void trap_SnapVector( float *v ) {
+	printf("G_SNAPVECTOR\n");
 	syscall( G_SNAPVECTOR, v );
 	return;
 }

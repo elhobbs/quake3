@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../../../qcommon/qcommon.h"
 #include <sys/dirent.h>
 #include <3ds.h>
+#include <3ds/svc.h>
 #include <malloc.h>
 #include <unistd.h>
 
@@ -139,12 +140,34 @@ char *Sys_GetClipboardData( void ) {
 	return NULL;
 }
 
+#define TICKS_PER_MSEC 268123.480
+
 int		Sys_Milliseconds (void) {
-	return osGetTime();
+	u64 ms = svcGetSystemTick() / TICKS_PER_MSEC;
+	return ms;
 }
 
 void	Sys_Mkdir (const char *path) {
 	mkdir(path, 0777);
+}
+
+int is_n3ds = 0;
+int detect_n3ds(void)
+{
+	if (is_n3ds != -1) {
+		return is_n3ds;
+	}
+	else {
+		if (ptmSysmInit() == 0) {
+			printf("ptmSysmInit: success\n");
+			is_n3ds = 1;
+			ptmSysmExit();
+		}
+		else {
+			is_n3ds = 0;
+		}
+	}
+	return is_n3ds;
 }
 
 void	Sys_Init (void) {
@@ -585,6 +608,7 @@ Sys_UnloadDll
 */
 void Sys_UnloadDll(void *dllHandle) {
 	Com_Printf("Sys_UnloadDll(%08x)\n", dllHandle);
+	svcSleepThread(5000000000LL);
 }
 
 int game_vmMain(int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11);
@@ -596,23 +620,32 @@ void cgame_dllEntry(int (QDECL *syscallptr)(int arg, ...));
 int q3ui_vmMain(int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11);
 void q3ui_dllEntry(int (QDECL *syscallptr)(int arg, ...));
 
+void Sys_Print_dllentry() {
+	printf("game : %08x\n", game_dllEntry);
+	printf("cgame: %08x\n", cgame_dllEntry);
+	printf("ui   : %08x\n", q3ui_dllEntry);
+}
+
 void * QDECL Sys_LoadDll(const char *name, char *fqpath, int (QDECL **entryPoint)(int, ...), int (QDECL *systemcalls)(int, ...)) {
 	Com_Printf("Sys_LoadDll\n  %s\n  %s\n", name, fqpath);
+	svcSleepThread(5000000000LL);
 	if (!strncasecmp(name, "ui", 2)) {
 		q3ui_dllEntry(systemcalls);
 		*entryPoint = q3ui_vmMain;
 		return "ui";
 	}
-	if (!strncasecmp(name, "cgame", 2)) {
+	if (!strncasecmp(name, "cgame", 5)) {
 		cgame_dllEntry(systemcalls);
 		*entryPoint = cgame_vmMain;
 		return "cgame";
 	}
-	if (!strncasecmp(name, "qagame", 2)) {
+	if (!strncasecmp(name, "qagame", 6)) {
 		game_dllEntry(systemcalls);
 		*entryPoint = game_vmMain;
 		return "qagame";
 	}
+	printf("failed to load %s\n", name);
+	while (1);
 	return 0;
 }
 
@@ -620,30 +653,13 @@ int main (int argc, char **argv) {
 	char *cmdline;
 	int i, len;
 
-#if 1
-
 	gfxInitDefault();
 	consoleInit(GFX_BOTTOM, 0);
-	gfxSwapBuffers();
-
+	//gfxSwapBuffers();
 
 	GPU_Init(NULL);
 
 	gfxSet3D(false);
-
-#if 0
-	if (csndInit() == 0) {
-		printf("Sound init ok!\n");
-	}
-	else {
-		printf("Sound init failed!\n");
-		while(1);
-	}
-#endif // 1
-
-#endif
-	printf("LINEAR  free: %dKB\n", (int)linearSpaceFree() / 1024);
-	printf("REGULAR free: %dKB\n", (int)getMemFree() / 1024);
 
 	// merge the command line, this is kinda silly
 	for (len = 1, i = 1; i < argc; i++)
@@ -660,9 +676,14 @@ int main (int argc, char **argv) {
 
 	printf("LINEAR  free: %dKB\n", (int)linearSpaceFree() / 1024);
 	printf("REGULAR free: %dKB\n", (int)getMemFree() / 1024);
+	//while (aptMainLoop()) {
+	//}
+	//return 0;
 	Com_Init(cmdline);
 	printf("LINEAR  free: %dKB\n", (int)linearSpaceFree() / 1024);
 	printf("REGULAR free: %dKB\n", (int)getMemFree() / 1024);
+
+	svcSleepThread(3000000000LL);
 
 	while (aptMainLoop()) {
 		Com_Frame( );

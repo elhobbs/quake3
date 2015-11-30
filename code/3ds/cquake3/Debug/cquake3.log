@@ -1,10 +1,12 @@
-﻿Build started 9/15/2015 9:49:00 PM.
-     1>Project "C:\devl\quake3\code\3ds\cquake3\cquake3.vcxproj" on node 2 (Clean target(s)).
-     1>CoreClean:
-         make clean
-         clean ...
-     1>Done Building Project "C:\devl\quake3\code\3ds\cquake3\cquake3.vcxproj" (Clean target(s)).
+﻿Build started 11/29/2015 11:39:57 PM.
+     1>Project "C:\devl\quake3\code\3ds\cquake3\cquake3.vcxproj" on node 2 (Build target(s)).
+     1>Build:
+         make -r 2>&1 | sed -e 's/\(.[a-zA-Z]\+\):\([0-9]\+\):/\1(\2):/
+         Building...
+         3dmath.c 3ds_client.c 3ds_glimp.c 3ds_input.c 3ds_main.c 3ds_net.c 3ds_snddma.c 3ds_vm.c gpu.c init.c ctr_rend.c ctr_rend_buffer.c ctr_rend_im.c ctr_rend_matrix.c ctr_rend_shader.c ctr_rend_texture.c ctr_rend_texture_copy.c ctr_rend_unimplemented.c ctr_rend_vao.c ctr_rend_vbo.c cmd.c common.c cvar.c files.c huffman.c md4.c msg.c cm_load.c cm_patch.c cm_polylib.c cm_test.c cm_trace.c net_chan.c unzip.c vm.c vm_interpreted.c sv_bot.c sv_ccmds.c sv_client.c sv_game.c sv_init.c sv_main.c sv_net_chan.c sv_snapshot.c sv_world.c cl_cgame.c cl_cin.c cl_console.c cl_input.c cl_keys.c cl_main.c cl_net_chan.c cl_parse.c cl_scrn.c cl_ui.c snd_adpcm.c snd_dma.c snd_mem.c snd_mix.c snd_wavelet.c be_aas_bspq3.c be_aas_cluster.c be_aas_debug.c be_aas_entity.c be_aas_file.c be_aas_main.c be_aas_move.c be_aas_optimize.c be_aas_reach.c be_aas_route.c be_aas_routealt.c be_aas_sample.c be_ai_char.c be_ai_chat.c be_ai_gen.c be_ai_goal.c be_ai_move.c be_ai_weap.c be_ai_weight.c be_ea.c be_interface.c l_crc.c l_libvar.c l_log.c l_memory.c l_precomp.c l_script.c l_struct.c tr_animation.c tr_backend.c tr_bsp.c tr_cmds.c tr_curve.c tr_flares.c tr_font.c tr_image.c tr_init.c tr_light.c tr_main.c tr_marks.c tr_mesh.c tr_model.c tr_noise.c tr_scene.c tr_shade.c tr_shade_calc.c tr_shader.c tr_shadows.c tr_sky.c tr_surface.c tr_world.c ui_syscalls.o ui_addbots.o ui_atoms.o ui_cdkey.o ui_cinematics.o ui_confirm.o ui_connect.o ui_controls2.o ui_credits.o ui_demo2.o ui_display.o ui_gameinfo.o ui_ingame.o ui_loadconfig.o ui_main.o ui_menu.o ui_mfield.o ui_mods.o ui_network.o ui_options.o ui_playermodel.o ui_players.o ui_playersettings.o ui_preferences.o ui_qmenu.o ui_removebots.o ui_saveconfig.o ui_serverinfo.o ui_servers2.o ui_setup.o ui_sound.o ui_sparena.o ui_specifyserver.o ui_splevel.o ui_sppostgame.o ui_spskill.o ui_startserver.o ui_team.o ui_teamorders.o ui_video.o g_main.c bg_misc.c bg_lib.c bg_pmove.c bg_slidemove.c q_math.c q_shared.c ai_vcmd.c ai_dmnet.c ai_dmq3.c ai_main.c ai_chat.c ai_cmd.c ai_team.c g_active.c g_arenas.c g_bot.c g_client.c g_cmds.c g_combat.c g_items.c g_mem.c g_misc.c g_missile.c g_mover.c g_session.c g_spawn.c g_svcmds.c g_target.c g_team.c g_trigger.c g_utils.c g_weapon.c g_syscalls.c cg_consolecmds.c cg_draw.c cg_drawtools.c cg_effects.c cg_ents.c cg_event.c cg_info.c cg_localents.c cg_main.c cg_marks.c cg_players.c cg_playerstate.c cg_predict.c cg_scoreboard.c cg_servercmds.c cg_snapshot.c cg_syscalls.c cg_view.c cg_weapons.c
+         make[1]: `/c/devl/quake3/code/3ds/cquake3/cquake3.3dsx' is up to date.
+     1>Done Building Project "C:\devl\quake3\code\3ds\cquake3\cquake3.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.62
+Time Elapsed 00:00:00.42

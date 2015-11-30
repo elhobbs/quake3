@@ -165,6 +165,7 @@ void RB_SurfaceAnim( md4Surface_t *surface ) {
 		v = (md4Vertex_t *)&v->weights[v->numWeights];
 	}
 
+	printf("RB_SurfaceAnim: %d\n", surface->numVerts);
 	tess.numVertexes += surface->numVerts;
 }
 

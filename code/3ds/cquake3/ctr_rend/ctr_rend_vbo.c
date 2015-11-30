@@ -1,5 +1,4 @@
 #include "ctr_rend.h"
-#include <3ds/linear.h>
 #include <stdlib.h>
 
 #if 1 //VBO stuff
@@ -71,6 +70,10 @@ void glBufferData(GLenum target, GLsizei size, const GLvoid *data, GLenum usage)
 	CTR_BUFFER *buf = ctr_handle_get(CTR_HANDLE_BUFFER, id);
 	if (buf == 0) {
 		return;
+	}
+	if (buf->data) {
+		linearFree(buf->data);
+		buf->data = 0;
 	}
 	GLubyte *buf_data = (GLubyte *)linearAlloc(size);
 	if (buf_data == 0) {

@@ -78,16 +78,30 @@ void SND_setup() {
 	cvar_t	*cv;
 	int scs;
 
+#ifdef _3DS
 	printf("SND_setup\n");
 	svcSleepThread(2000000000);
+#endif
 
 	cv = Cvar_Get( "com_soundMegs", DEF_COMSOUNDMEGS, CVAR_LATCH | CVAR_ARCHIVE );
 
 	scs = (cv->integer*1536);
 
-	buffer = linearAlloc(scs*sizeof(sndBuffer) );
+	if (buffer) {
+		free(buffer);
+		buffer = 0;
+	}
+
 	if (buffer == 0) {
-		Sys_Error("Falied to allocate soud buffer\n");
+		buffer = malloc(scs*sizeof(sndBuffer));
+		if (buffer == 0) {
+			Sys_Error("Falied to allocate soud buffer %d %d %d\n", scs, sizeof(sndBuffer), scs*sizeof(sndBuffer));
+		}
+	}
+
+	if (sfxScratchBuffer) {
+		free(sfxScratchBuffer);
+		sfxScratchBuffer = 0;
 	}
 	// allocate the stack based hunk allocator
 	sfxScratchBuffer = malloc(SND_CHUNK_SIZE * sizeof(short) * 4);	//Hunk_Alloc(SND_CHUNK_SIZE * sizeof(short) * 4);

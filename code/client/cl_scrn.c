@@ -438,16 +438,18 @@ This will be called twice if rendering in stereo mode
 void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	re.BeginFrame( stereoFrame );
 
+	//printf("SCR_DrawScreenField: %d %d\n", cls.state, stereoFrame);
+
 	// wide aspect ratio screens need to have the sides cleared
 	// unless they are displaying game renderings
 	if ( cls.state != CA_ACTIVE ) {
 		if ( cls.glconfig.vidWidth * 480 > cls.glconfig.vidHeight * 640 ) {
 			re.SetColor( g_color_table[0] );
+			printf("SCR_DrawScreenField0: %d %d\n", cls.glconfig.vidWidth, cls.glconfig.vidHeight);
 			re.DrawStretchPic( 0, 0, cls.glconfig.vidWidth, cls.glconfig.vidHeight, 0, 0, 0, 0, cls.whiteShader );
 			re.SetColor( NULL );
 		}
 	}
-
 	if ( !uivm ) {
 		Com_DPrintf("draw screen without UI loaded\n");
 		return;
@@ -519,6 +521,7 @@ text to the screen.
 void SCR_UpdateScreen( void ) {
 	static int	recursive;
 
+	//printf("here 0\n");
 	if ( !scr_initialized ) {
 		return;				// not initialized yet
 	}
@@ -528,6 +531,7 @@ void SCR_UpdateScreen( void ) {
 	}
 	recursive = 1;
 
+	//printf("here 1\n");
 	// if running in stereo, we need to draw the frame twice
 	if ( cls.glconfig.stereoEnabled ) {
 		SCR_DrawScreenField( STEREO_LEFT );
@@ -535,12 +539,14 @@ void SCR_UpdateScreen( void ) {
 	} else {
 		SCR_DrawScreenField( STEREO_CENTER );
 	}
+	//printf("here 2\n");
 
 	if ( com_speeds->integer ) {
 		re.EndFrame( &time_frontend, &time_backend );
 	} else {
 		re.EndFrame( NULL, NULL );
 	}
+	//printf("here 3\n");
 
 	recursive = 0;
 }

@@ -415,6 +415,12 @@ The cgame module is making a system call
 #define	VMA(x) VM_ArgPtr(args[x])
 #define	VMF(x)	((float *)args)[x]
 int CL_CgameSystemCalls( int *args ) {
+#ifdef Q3_STATIC
+	void *p0 = __builtin_return_address(0);
+	void *p1 = __builtin_return_address(1);
+	void *p2 = __builtin_return_address(2);
+#endif
+	//printf("CL_CgameSystemCalls: %d\n", args[0]);
 	switch( args[0] ) {
 	case CG_PRINT:
 		Com_Printf( "%s", VMA(1) );
@@ -505,6 +511,9 @@ int CL_CgameSystemCalls( int *args ) {
 		CM_TransformedBoxTrace( VMA(1), VMA(2), VMA(3), VMA(4), VMA(5), args[6], args[7], VMA(8), VMA(9), /*int capsule*/ qtrue );
 		return 0;
 	case CG_CM_MARKFRAGMENTS:
+#if 0 //def Q3_STATIC
+		printf("%08x %08x %08x\n", p0, p1, p2);
+#endif
 		return re.MarkFragments( args[1], VMA(2), VMA(3), args[4], VMA(5), args[6], VMA(7) );
 	case CG_S_STARTSOUND:
 		S_StartSound( VMA(1), args[2], args[3], args[4] );
@@ -555,9 +564,11 @@ int CL_CgameSystemCalls( int *args ) {
 		re.AddRefEntityToScene( VMA(1) );
 		return 0;
 	case CG_R_ADDPOLYTOSCENE:
+		printf("CG_R_ADDPOLYTOSCENE: %08x\n", p0);
 		re.AddPolyToScene( args[1], args[2], VMA(3), 1 );
 		return 0;
 	case CG_R_ADDPOLYSTOSCENE:
+		printf("CG_R_ADDPOLYSTOSCENE: %08x\n", p0);
 		re.AddPolyToScene( args[1], args[2], VMA(3), args[4] );
 		return 0;
 	case CG_R_LIGHTFORPOINT:

@@ -274,6 +274,7 @@
     <ClCompile Include="ctr_rend\ctr_rend_matrix.c" />
     <ClCompile Include="ctr_rend\ctr_rend_shader.c" />
     <ClCompile Include="ctr_rend\ctr_rend_texture.c" />
+    <ClCompile Include="ctr_rend\ctr_rend_texture_copy.c" />
     <ClCompile Include="ctr_rend\ctr_rend_unimplemented.c" />
     <ClCompile Include="ctr_rend\ctr_rend_vao.c" />
     <ClCompile Include="ctr_rend\ctr_rend_vbo.c" />

@@ -460,6 +460,9 @@ static void FillCloudySkySide( const int mins[2], const int maxs[2], qboolean ad
 	int vertexStart = tess.numVertexes;
 	int tHeight, sWidth;
 
+	return;
+	printf("FillCloudySkySide\n");
+
 	tHeight = maxs[1] - mins[1] + 1;
 	sWidth = maxs[0] - mins[0] + 1;
 
@@ -708,6 +711,8 @@ void RB_DrawSun( void ) {
 	if ( !r_drawSun->integer ) {
 		return;
 	}
+
+	printf("RB_DrawSun\n");
 	qglLoadMatrixf( backEnd.viewParms.world.modelMatrix );
 	qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
 

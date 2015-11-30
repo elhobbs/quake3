@@ -8,6 +8,10 @@
 #include <stdbool.h>
 #include <math.h>
 
+#ifndef M_PI
+#define M_PI		3.14159265358979323846
+#endif
+
 typedef union { float c[4]; struct { float w, z, y, x; }; } vector_4f;
 typedef union { float m[16]; vector_4f r[4]; } matrix_4x4;
 

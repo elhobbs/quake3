@@ -1,10 +1,14 @@
 #include "ctr_rend.h"
-#include <3ds/linear.h>
+#ifdef _3DS
 #include <3ds/gpu/shaderProgram.h>
+#endif
+
 #include <stdlib.h>
 #include "gpu.h"
 
+#ifdef _3DS
 #include "vshader_shbin.h"
+#endif
 
 GLuint glCreateProgram(void) {
 	shaderProgram_s *shaderprogram = (shaderProgram_s *)malloc(sizeof(*shaderprogram));
@@ -49,7 +53,7 @@ void glAttachShader(GLuint program, GLuint shader) {
 	if (dvlb == 0 || shaderprogram == 0) {
 		return;
 	}
-
+#ifdef _3DS
 	switch(dvlb->DVLE[0].type) {
 	case VERTEX_SHDR:
 		shaderProgramSetVsh(shaderprogram, &dvlb->DVLE[0]);
@@ -58,6 +62,7 @@ void glAttachShader(GLuint program, GLuint shader) {
 		shaderProgramSetGsh(shaderprogram, &dvlb->DVLE[0], 6); //TODO: fix this
 		break;
 	}
+#endif
 }
 
 void glLinkProgram(GLuint program) {
@@ -84,11 +89,15 @@ GLint glGetUniformLocation(GLuint program, const GLchar *name) {
 }
 
 void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+#ifdef _3DS
 	GPU_SetFloatUniformMatrix(GPU_VERTEX_SHADER, location, (matrix_4x4*)value);
+#endif
 }
 
 void glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
+#ifdef _3DS
 	GPU_SetFloatUniform(GPU_VERTEX_SHADER, location, (u32*)value, count);
+#endif
 }
 
 int uLoc_projection, uLoc_modelView;
@@ -112,9 +121,10 @@ void ctr_rend_shader_init() {
 	if (shaderprogram == 0) {
 		return;
 	}
-	shaderProgramInit(shaderprogram);
 	ctr_handle_set(CTR_HANDLE_PROGRAM, prog_id, shaderprogram);
 
+#ifdef _3DS
+	shaderProgramInit(shaderprogram);
 	//manually create the shader so we can use id 0
 	GLuint vsh_id = 0;
 	glShaderBinary(1, &vsh_id, 0, vshader_shbin, vshader_shbin_size);
@@ -131,11 +141,13 @@ void ctr_rend_shader_init() {
 
 	//set the default shader
 	shaderProgramUse(shaderprogram);
-	ctr_state.bound_program = prog_id;
 
 	glUniformMatrix4fv(uLoc_material, 1, 0, material.m);
 	glUniform4fv(uLoc_lightVec, 1, (float[]){ 0.0f, -1.0f, 0.0f, 0.0f });
 	glUniform4fv(uLoc_lightHalfVec, 1, (float[]){ 0.0f, -1.0f, 0.0f, 0.0f });
 	glUniform4fv(uLoc_lightClr, 1, (float[]){ 1.0f, 1.0f, 1.0f, 1.0f });
+#endif
+
+	ctr_state.bound_program = prog_id;
 
 }

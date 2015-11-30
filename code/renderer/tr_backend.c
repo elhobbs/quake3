@@ -778,6 +778,7 @@ void RE_StretchRaw(int x, int y, int w, int h, int cols, int rows, const byte *d
 
 		RB_SetGL2D();
 
+#ifdef _3DS
 		vertex ptr[6] = {
 			{
 				{ x, y, 0 },
@@ -807,27 +808,27 @@ void RE_StretchRaw(int x, int y, int w, int h, int cols, int rows, const byte *d
 
 
 		qglEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(vertex), ptr[0].position);
+		qglVertexPointer(3, GL_FLOAT, sizeof(vertex), ptr[0].position);
 		
 		qglEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, sizeof(vertex), ptr[0].normal);
+		qglNormalPointer(GL_FLOAT, sizeof(vertex), ptr[0].normal);
 
 		qglEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(3, GL_FLOAT, sizeof(vertex), ptr[0].color);
+		qglColorPointer(3, GL_FLOAT, sizeof(vertex), ptr[0].color);
 		
 		qglEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(vertex), ptr[0].texcoord);
+		qglTexCoordPointer(2, GL_FLOAT, sizeof(vertex), ptr[0].texcoord);
 
 		short ind[6] = { 0, 1, 2, 0, 2, 3 };
-		glDrawElements(GL_TRIANGLES, 6, GL_SHORT, ind);
+		qglDrawElements(GL_TRIANGLES, 6, GL_SHORT, ind);
 
 		qglDisableClientState(GL_NORMAL_ARRAY);
 		qglDisableClientState(GL_COLOR_ARRAY);
 		qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 
-
-	/*qglColor3f( tr.identityLight, tr.identityLight, tr.identityLight );
+#else
+	qglColor3f( tr.identityLight, tr.identityLight, tr.identityLight );
 
 	qglBegin (GL_QUADS);
 	qglTexCoord2f ( 0.5f / cols,  0.5f / rows );
@@ -838,7 +839,8 @@ void RE_StretchRaw(int x, int y, int w, int h, int cols, int rows, const byte *d
 	qglVertex2f (x+w, y+h);
 	qglTexCoord2f ( 0.5f / cols, ( rows - 0.5f ) / rows );
 	qglVertex2f (x, y+h);
-	qglEnd ();*/
+	qglEnd ();
+#endif
 }
 
 void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty) {
@@ -911,6 +913,9 @@ const void *RB_StretchPic ( const void *data ) {
 	RB_CHECKOVERFLOW( 4, 6 );
 	numVerts = tess.numVertexes;
 	numIndexes = tess.numIndexes;
+
+	//printf("RB_StretchPic: %3.2f %3.2f %3.2f %3.2f\n", cmd->x, cmd->y, cmd->w, cmd->h);
+	//printf("%1.3f %1.3f %1.3f %1.3f\n", cmd->s1, cmd->t1, cmd->s2, cmd->t2);
 
 	tess.numVertexes += 4;
 	tess.numIndexes += 6;
@@ -1140,6 +1145,7 @@ void RB_ExecuteRenderCommands( const void *data ) {
 	}
 
 	while ( 1 ) {
+		//printf("RB_ExecuteRenderCommands: %d %08x\n", *(const int *)data, data );
 		switch ( *(const int *)data ) {
 		case RC_SET_COLOR:
 			data = RB_SetColor( data );

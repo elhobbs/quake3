@@ -50,7 +50,7 @@ INCLUDES	:=	include ../ ../renderer/include $(GDIR) ctr_rend
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard
 
-CFLAGS	:=	-g -Wall -Os -mword-relocations \
+CFLAGS	:=	-g -Wall -O0 -mword-relocations \
 			-fomit-frame-pointer -ffast-math \
 			$(ARCH)
 

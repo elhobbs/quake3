@@ -1165,7 +1165,7 @@ static void RoQReset() {
 static void RoQInterrupt(void)
 {
 	byte				*framedata;
-        short		sbuf[32768];
+        static short		sbuf[32768];
         int		ssize;
         
 	if (currentHandle < 0) return;
@@ -1176,6 +1176,7 @@ static void RoQInterrupt(void)
 			if (cinTable[currentHandle].looping) {
 				RoQReset();
 			} else {
+				printf("RoQInterrupt eof %d %d\n", cinTable[currentHandle].RoQPlayed, cinTable[currentHandle].ROQSize);
 				cinTable[currentHandle].status = FMV_EOF;
 			}
 		} else {
@@ -1247,6 +1248,7 @@ redump:
 		case	ROQ_QUAD_JPEG:
 			break;
 		default:
+			printf("roq_id: eof %d\n", cinTable[currentHandle].roq_id);
 			cinTable[currentHandle].status = FMV_EOF;
 			break;
 	}	
@@ -1258,6 +1260,7 @@ redump:
 			if (cinTable[currentHandle].looping) {
 				RoQReset();
 			} else {
+				printf("read next frame eof\n");
 				cinTable[currentHandle].status = FMV_EOF;
 			}
 		} else {
@@ -1287,6 +1290,7 @@ redump:
 //
 //	assert(cinTable[currentHandle].RoQFrameSize <= 65536);
 //	r = Sys_StreamedRead( cin.file, cinTable[currentHandle].RoQFrameSize+8, 1, cinTable[currentHandle].iFile );
+	//printf("roq: %d %d\n", cinTable[currentHandle].RoQPlayed, cinTable[currentHandle].RoQFrameSize + 8);
 	cinTable[currentHandle].RoQPlayed	+= cinTable[currentHandle].RoQFrameSize+8;
 }
 
@@ -1408,11 +1412,15 @@ e_status CIN_RunCinematic (int handle)
 	int	start = 0;
 	int     thisTime = 0;
 
-	if (handle < 0 || handle>= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) return FMV_EOF;
+	if (handle < 0 || handle >= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) {
+		printf("CIN_RunCinematic eof\n");
+		return FMV_EOF;
+	}
 
 	if (cin.currentHandle != handle) {
 		currentHandle = handle;
 		cin.currentHandle = currentHandle;
+		printf("CIN_RunCinematic set eof\n");
 		cinTable[currentHandle].status = FMV_EOF;
 		RoQReset();
 	}
@@ -1441,11 +1449,14 @@ e_status CIN_RunCinematic (int handle)
 	}
 	// we need to use CL_ScaledMilliseconds because of the smp mode calls from the renderer
 	cinTable[currentHandle].tfps = ((((CL_ScaledMilliseconds()*com_timescale->value) - cinTable[currentHandle].startTime)*3)/100);
+	//printf("roq: %d %d %d %d %f\n", cinTable[currentHandle].tfps, cinTable[currentHandle].numQuads, CL_ScaledMilliseconds(), cinTable[currentHandle].startTime, com_timescale->value);
 
 	start = cinTable[currentHandle].startTime;
 	while(  (cinTable[currentHandle].tfps != cinTable[currentHandle].numQuads)
 		&& (cinTable[currentHandle].status == FMV_PLAY) ) 
 	{
+		//printf("roq: %d %d\n", cinTable[currentHandle].tfps, cinTable[currentHandle].numQuads);
+		//while (1);
 		RoQInterrupt();
 		if (start != cinTable[currentHandle].startTime) {
 			// we need to use CL_ScaledMilliseconds because of the smp mode calls from the renderer
@@ -1462,6 +1473,7 @@ e_status CIN_RunCinematic (int handle)
 	}
 
 	if (cinTable[currentHandle].status == FMV_EOF) {
+		printf("cinematic eof\n");
 	  if (cinTable[currentHandle].looping) {
 		RoQReset();
 	  } else {
@@ -1607,7 +1619,7 @@ void CIN_DrawCinematic (int handle) {
 		return;
 	}
 
-	//printf("CIN_DrawCinematic\n");
+	printf("CIN_DrawCinematic\n");
 
 	x = cinTable[handle].xpos;
 	y = cinTable[handle].ypos;

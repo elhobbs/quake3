@@ -32,9 +32,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "qcommon.h"
 #include "unzip.h"
+#ifdef _3DS
 #include <3ds.h>
+#endif
 
-void waitforit(char *str) {
+int waitforit(char *str) {
 #if 0
 	printf("%s ...", str);
 	do {
@@ -45,6 +47,7 @@ void waitforit(char *str) {
 	} while ((hidKeysHeld() & KEY_A) != 0);
 	printf("done.\n");
 #endif
+	return 0;
 }
 
 /*

@@ -719,6 +719,9 @@
     <ClCompile Include="ctr_rend\ctr_rend_buffer.c">
       <Filter>3ds\ctr_rend</Filter>
     </ClCompile>
+    <ClCompile Include="ctr_rend\ctr_rend_texture_copy.c">
+      <Filter>3ds\ctr_rend</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\qcommon\cm_local.h">

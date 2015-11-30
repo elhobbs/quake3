@@ -1831,11 +1831,11 @@ PmoveSingle
 
 ================
 */
-#if 1
-#define trap_SnapVector game_trap_SnapVector
-#endif
-
+#ifdef Q3_STATIC
+void Sys_SnapVector(float *v);
+#else
 void trap_SnapVector( float *v );
+#endif
 
 void PmoveSingle (pmove_t *pmove) {
 	pm = pmove;
@@ -2016,7 +2016,11 @@ void PmoveSingle (pmove_t *pmove) {
 	PM_WaterEvents();
 
 	// snap some parts of playerstate to save network bandwidth
+#ifdef Q3_STATIC
+	Sys_SnapVector( pm->ps->velocity );
+#else
 	trap_SnapVector( pm->ps->velocity );
+#endif
 }
 
 

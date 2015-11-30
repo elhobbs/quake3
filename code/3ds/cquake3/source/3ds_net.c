@@ -135,6 +135,7 @@ Sys_SendPacket
 ==================
 */
 void Sys_SendPacket( int length, const void *data, netadr_t to ) {
+	printf("Sys_SendPacket: %d\n", length);
 }
 
 /*
@@ -145,6 +146,7 @@ Never called by the game logic, just the system event queing
 ==================
 */
 qboolean	Sys_GetPacket ( netadr_t *net_from, msg_t *net_message ) {
+	printf("Sys_GetPacket\n");
 	return qfalse;
 }
 
@@ -236,4 +238,6 @@ sleeps msec or until net socket is ready
 ====================
 */
 void NET_Sleep(int msec) {
+	printf("NET_Sleep %d\n", msec);
+	svcSleepThread(1000000LL * msec);
 }

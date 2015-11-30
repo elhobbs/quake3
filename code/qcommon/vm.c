@@ -339,9 +339,42 @@ int QDECL VM_DllSyscall( int arg, ... ) {
   va_end(ap);
   
   return currentVM->systemCall( args );
+#else
+#if defined _3DS
+int args[16];
+int i;
+va_list ap;
+
+args[0] = arg;
+
+va_start(ap, arg);
+for (i = 1; i < sizeof(args) / sizeof(args[i]); i++)
+	args[i] = va_arg(ap, int);
+va_end(ap);
+
+if (arg == 42) {
+	void *p0 = __builtin_return_address(0);
+
+	printf("    %08x :: %08x %8s\n", p0, currentVM, currentVM->name);
+}
+
+return currentVM->systemCall(args);
+
 #else // original id code
+	printf("VM_DllSyscall %d\n", arg);
 	return currentVM->systemCall( &arg );
 #endif
+#endif
+}
+
+int VM_test(char *name) {
+	if (currentVM == 0 || strcmp(currentVM->name, name)) {
+		if (currentVM) {
+			printf("VM_Test: %s expecting %s\n", currentVM->name, name);
+		}
+		return 1;
+	}
+	return 0;
 }
 
 /*
@@ -473,7 +506,7 @@ vm_t *VM_Create( const char *module, int (*systemCalls)(int *),
 
 #ifdef Q3_STATIC
 		Com_Printf( "Loading dll file %s.\n", vm->name );
-		vm->dllHandle = Sys_LoadDll( module, vm->fqpath , &vm->entryPoint, VM_DllSyscall );
+		vm->dllHandle = Sys_LoadDll(module, vm->fqpath, &vm->entryPoint, VM_DllSyscall );
 		if ( vm->dllHandle ) {
 			return vm;
 		}
@@ -623,6 +656,7 @@ void *VM_ArgPtr( int intValue ) {
 	  return NULL;
 
 	if ( currentVM->entryPoint ) {
+		//printf("VM_ArgPtr: %08x %08x\n", intValue, currentVM->dataBase);
 		return (void *)(currentVM->dataBase + intValue);
 	}
 	else {
@@ -709,7 +743,7 @@ int	QDECL VM_Call( vm_t *vm, int callnum, ... ) {
                             args[8],  args[9], args[10], args[11],
                             args[12], args[13], args[14], args[15]);
 	} else if ( vm->compiled ) {
-		r = VM_CallCompiled( vm, &callnum );
+ 		r = VM_CallCompiled( vm, &callnum );
 	} else {
 		r = VM_CallInterpreted( vm, &callnum );
 	}

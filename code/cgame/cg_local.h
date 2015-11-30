@@ -1461,7 +1461,14 @@ void CG_Respawn( void );
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
-#if 1
+#ifdef Q3_STATIC
+#ifndef hack_def
+#define hack_def 1
+#else
+#if hack_def != 1
+#error bad value hack_def 
+#endif
+#endif
 #define dllEntry cgame_dllEntry
 #define vmMain cgame_vmMain
 #define PASSFLOAT cgame_PASSFLOAT

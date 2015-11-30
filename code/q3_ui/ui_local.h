@@ -614,7 +614,14 @@ void UI_SPPostgameMenu_f( void );
 void UI_SPSkillMenu( const char *arenaInfo );
 void UI_SPSkillMenu_Cache( void );
 
-#if 1
+#ifdef Q3_STATIC
+#ifndef hack_def
+#define hack_def 2
+#else
+#if hack_def != 2
+#error bad value hack_def 
+#endif
+#endif
 #define dllEntry q3ui_dllEntry
 #define vmMain q3ui_vmMain
 #define PASSFLOAT q3ui_PASSFLOAT

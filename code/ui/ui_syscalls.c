@@ -28,6 +28,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #error "Do not use in VM build"
 #endif
 
+#ifdef Q3_STATIC
+#define syscall ui_syscall
+#endif
+
 static int (QDECL *syscall)( int arg, ... ) = (int (QDECL *)( int, ...))-1;
 
 void dllEntry( int (QDECL *syscallptr)( int arg,... ) ) {
@@ -162,11 +166,25 @@ void trap_R_RenderScene( const refdef_t *fd ) {
 	syscall( UI_R_RENDERSCENE, fd );
 }
 
+
 void trap_R_SetColor( const float *rgba ) {
 	syscall( UI_R_SETCOLOR, rgba );
 }
 
+int VM_test(char *name);
+
 void trap_R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader ) {
+#ifdef Q3_STATIC
+	void *p0 = __builtin_return_address(0);
+	void *p1 = __builtin_return_address(1);
+	void *p2 = __builtin_return_address(2);
+
+	if (VM_test("ui")) {
+		printf("]]] :: %08x %08x %08x\n", p0, p1, p2);
+		while (1);
+	}
+#endif
+
 	syscall( UI_R_DRAWSTRETCHPIC, PASSFLOAT(x), PASSFLOAT(y), PASSFLOAT(w), PASSFLOAT(h), PASSFLOAT(s1), PASSFLOAT(t1), PASSFLOAT(s2), PASSFLOAT(t2), hShader );
 }
 
@@ -227,6 +245,7 @@ void trap_Key_SetCatcher( int catcher ) {
 }
 
 void trap_GetClipboardData( char *buf, int bufsize ) {
+	printf("UI_GETCLIPBOARDDATA\n");
 	syscall( UI_GETCLIPBOARDDATA, buf, bufsize );
 }
 

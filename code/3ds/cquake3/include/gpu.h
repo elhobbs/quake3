@@ -5,7 +5,9 @@
 
 #pragma once
 #include <string.h>
+#ifdef _3DS
 #include <3ds.h>
+#endif
 #include "3dmath.h"
 
 void gpuInit(void);

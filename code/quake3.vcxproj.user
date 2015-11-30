@@ -6,7 +6,7 @@
     <LocalDebuggerCommandArguments>+set fs_basepath c:\quake3</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>+set fs_basepath c:\quake3</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>+set fs_basepath c:\quake3 +map q3dm0</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TA|Win32'">
